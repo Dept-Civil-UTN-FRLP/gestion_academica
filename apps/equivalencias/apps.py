@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class EquivalenciasConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'equivalencias'
+    name = 'apps.equivalencias'
