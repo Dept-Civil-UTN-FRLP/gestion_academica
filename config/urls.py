@@ -21,10 +21,10 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('planta/', include('apps.planta_docente.urls')),
-    path('equivalencias/', include('apps.equivalencias.urls')),
-    path('practica/', include('apps.practica_supervisada.urls')),
-    path('carrera/', include('apps.carrera_academica.urls')),
+    #path('planta/', include('apps.planta_docente.urls')),
+    #path('equivalencias/', include('apps.equivalencias.urls')),
+    #path('practica/', include('apps.practica_supervisada.urls')),
+    #path('carrera/', include('apps.carrera_academica.urls')),
 ]
 
 if settings.DEBUG:
