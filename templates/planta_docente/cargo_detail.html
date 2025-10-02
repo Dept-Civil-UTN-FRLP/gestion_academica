@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Cargo - {{ cargo.docente.apellido }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:dashboard' %}">Planta Docente</a></li>
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:cargo_list' %}">Cargos</a></li>
+<li class="breadcrumb-item active">Detalle</li>
+{% endblock %}
+
+{% block page_title %}Detalle del Cargo{% endblock %}
+
+{% block page_actions %}
+{% if cargo.estado == 'activo' %}
+<a href="{% url 'planta_docente:cargo_update' cargo.pk %}" class="btn btn-warning">
+    <i class="bi bi-pencil"></i> Editar
+</a>
+<a href="{% url 'planta_docente:cargo_baja' cargo.pk %}" class="btn btn-danger">
+    <i class="bi bi-x-circle"></i> Dar de Baja
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <!-- Información del Docente -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-person-circle"></i> Docente
+            </div>
+            <div class="card-body">
+                <h5>
+                    <a href="{% url 'planta_docente:docente_detail' cargo.docente.pk %}">
+                        {{ cargo.docente.apellido }}, {{ cargo.docente.nombre }}
+                    </a>
+                </h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Legajo:</dt>
+                    <dd class="col-sm-8">{{ cargo.docente.legajo|default:"Sin legajo" }}</dd>
+                    
+                    <dt class="col-sm-4">Documento:</dt>
+                    <dd class="col-sm-8">{{ cargo.docente.documento }}</dd>
+                    
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">
+                        {% if cargo.docente|principal_email %}
+                            <a href="mailto:{{ cargo.docente|principal_email }}">{{ cargo.docente|principal_email }}</a>
+                        {% else %}
+                            <span class="text-muted">No disponible</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Información de la Asignatura -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-book"></i> Asignatura
+            </div>
+            <div class="card-body">
+                <h5>
+                    <a href="{% url 'planta_docente:asignatura_detail' cargo.asignatura.pk %}">
+                        {{ cargo.asignatura.nombre }}
+                    </a>
+                </h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Carrera:</dt>
+                    <dd class="col-sm-8">{{ cargo.asignatura.carrera.nombre }}</dd>
+                    
+                    <dt class="col-sm-4">Departamento:</dt>
+                    <dd class="col-sm-8">{{ cargo.asignatura.departamento.nombre }}</dd>
+                    
+                    <dt class="col-sm-4">Nivel:</dt>
+                    <dd class="col-sm-8">{{ cargo.asignatura.get_nivel_display }}</dd>
+                    
+                    <dt class="col-sm-4">Dictado:</dt>
+                    <dd class="col-sm-8">{{ cargo.asignatura.get_forma_dictado_display }}</dd>
+                    
+                    <dt class="col-sm-4">Comisión:</dt>
+                    <dd class="col-sm-8">{{ cargo.comision }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <!-- Detalles del Cargo -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-briefcase"></i> Detalles del Cargo
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">Categoría:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-primary">{{ cargo.get_categoria_display }}</span>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Carácter:</dt>
+                    <dd class="col-sm-7">{{ cargo.get_caracter_display }}</dd>
+                    
+                    <dt class="col-sm-5">Dedicación:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-secondary">{{ cargo.get_dedicacion_display }}</span>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Horas:</dt>
+                    <dd class="col-sm-7">{{ cargo.cantidad_horas }} horas semanales</dd>
+                    
+                    <dt class="col-sm-5">Estado:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge badge-status-{{ cargo.estado }}">
+                            {{ cargo.get_estado_display }}
+                        </span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Fechas y Vencimientos -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-calendar-event"></i> Fechas
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Fecha Inicio:</dt>
+                    <dd class="col-sm-7">{{ cargo.fecha_inicio|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-5">Fecha Vencimiento:</dt>
+                    <dd class="col-sm-7">
+                        {{ cargo.fecha_vencimiento|date:"d/m/Y" }}
+                        {% if cargo.estado == 'activo' %}
+                            {% now "Y-m-d" as today %}
+                            {% if cargo.fecha_vencimiento|date:"Y-m-d" < today %}
+                                <br><span class="badge bg-danger">Vencido hace {{ cargo.fecha_vencimiento|timesince }}</span>
+                            {% elif cargo.fecha_vencimiento|date:"Y-m-d"|add_days:"-30" < today %}
+                                <br><span class="badge bg-warning text-dark">Vence en {{ cargo.fecha_vencimiento|timeuntil }}</span>
+                            {% else %}
+                                <br><span class="badge bg-success">Vigente</span>
+                            {% endif %}
+                        {% endif %}
+                    </dd>
+                    
+                    {% if cargo.fecha_final %}
+                    <dt class="col-sm-5">Fecha Fin:</dt>
+                    <dd class="col-sm-7">{{ cargo.fecha_final|date:"d/m/Y" }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Resolución -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-file-earmark-text"></i> Resolución de Alta
+            </div>
+            <div class="card-body">
+                <h6>{{ cargo.resolucion_alta }}</h6>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Objeto:</dt>
+                    <dd class="col-sm-7">{{ cargo.resolucion_alta.get_objeto_display }}</dd>
+                    
+                    <dt class="col-sm-5">Origen:</dt>
+                    <dd class="col-sm-7">{{ cargo.resolucion_alta.get_origen_display }}</dd>
+                    
+                    <dt class="col-sm-5">Fecha Emisión:</dt>
+                    <dd class="col-sm-7">{{ cargo.resolucion_alta.fecha_emision|date:"d/m/Y" }}</dd>
+                    
+                    {% if cargo.resolucion_alta.archivo_digital %}
+                    <dt class="col-sm-5">Archivo:</dt>
+                    <dd class="col-sm-7">
+                        <a href="{{ cargo.resolucion_alta.archivo_digital.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-file-pdf"></i> Ver Resolución
+                        </a>
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if cargo.observaciones %}
+<div class="card mt-3">
+    <div class="card-header">
+        <i class="bi bi-chat-left-text"></i> Observaciones
+    </div>
+    <div class="card-body">
+        <p class="mb-0">{{ cargo.observaciones }}</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

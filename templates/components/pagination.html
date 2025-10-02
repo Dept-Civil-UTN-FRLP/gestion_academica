@@ -1,0 +1,59 @@
+{% if page_obj.has_other_pages %}
+<nav aria-label="Paginación">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?{% url_replace request 'page' 1 %}">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?{% url_replace request 'page' page_obj.previous_page_number %}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+        {% endif %}
+        
+        {% if show_first %}
+        <li class="page-item">
+            <a class="page-link" href="?{% url_replace request 'page' 1 %}">1</a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">...</span>
+        </li>
+        {% endif %}
+        
+        {% for page_number in page_numbers %}
+        <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
+            <a class="page-link" href="?{% url_replace request 'page' page_number %}">
+                {{ page_number }}
+            </a>
+        </li>
+        {% endfor %}
+        
+        {% if show_last %}
+        <li class="page-item disabled">
+            <span class="page-link">...</span>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?{% url_replace request 'page' page_obj.paginator.num_pages %}">
+                {{ page_obj.paginator.num_pages }}
+            </a>
+        </li>
+        {% endif %}
+        
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?{% url_replace request 'page' page_obj.next_page_number %}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?{% url_replace request 'page' page_obj.paginator.num_pages %}">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

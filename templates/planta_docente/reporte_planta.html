@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Reporte - Planta Docente Completa{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:dashboard' %}">Planta Docente</a></li>
+<li class="breadcrumb-item active">Reporte Planta Completa</li>
+{% endblock %}
+
+{% block page_title %}Reporte - Planta Docente Completa{% endblock %}
+
+{% block page_actions %}
+<button onclick="window.print()" class="btn btn-secondary">
+    <i class="bi bi-printer"></i> Imprimir
+</button>
+<a href="#" class="btn btn-success" onclick="alert('Funcionalidad de exportación en desarrollo')">
+    <i class="bi bi-file-excel"></i> Exportar Excel
+</a>
+{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        body * { visibility: hidden; }
+        .printable-area, .printable-area * { visibility: visible; }
+        .printable-area { position: absolute; left: 0; top: 0; width: 100%; }
+        .btn, .breadcrumb, .sidebar, .navbar, .page-actions { display: none !important; }
+        .main-content { margin-left: 0 !important; padding: 0 !important; }
+        .card { border: 1px solid #dee2e6 !important; box-shadow: none !important; }
+    }
+</style>
+
+<div class="printable-area">
+    
+    {% regroup cargos by asignatura.departamento as departamentos_agrupados %}
+
+    {% for departamento_grupo in departamentos_agrupados %}
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-building"></i> {{ departamento_grupo.grouper.nombre }}</h5>
+        </div>
+
+        {% with resumen=resumen_por_depto_dict|get_item:departamento_grupo.grouper.pk %}
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Docente</th>
+                            <th>Legajo</th>
+                            <th>Asignatura</th>
+                            <th>Cargo</th>
+                            <th>Dedicación</th>
+                            <th>Horas</th>
+                            <th>Carácter</th>
+                            <th>Vencimiento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cargo in departamento_grupo.list %}
+                        <tr>
+                            <td>{{ cargo.docente.apellido }}, {{ cargo.docente.nombre }}</td>
+                            <td>{{ cargo.docente.legajo|default:"-" }}</td>
+                            <td>{{ cargo.asignatura.nombre }}</td>
+                            <td>{{ cargo.get_categoria_display }}</td>
+                            <td>{{ cargo.get_dedicacion_display }}</td>
+                            <td>{{ cargo.cantidad_horas }}hs</td>
+                            <td>{{ cargo.get_caracter_display }}</td>
+                            <td>{{ cargo.fecha_vencimiento|date:"d/m/Y"|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row text-center mb-4">
+                <div class="col">
+                    <h4 class="text-info">{{ resumen.total_cargos_reg|default:0 }}/{{ resumen.total_cargos|default:0 }}</h4>
+                    <p class="text-muted small">Cargos Activos (Reg/Ord)</p>
+                </div>
+                <div class="col">
+                    <h4 class="text-secondary">{{ resumen.total_exclusivas_reg|default:0 }}/{{ resumen.total_exclusivas|default:0 }}</h4>
+                    <p class="text-muted small">Exclusivas</p>
+                </div>
+                <div class="col">
+                    <h4 class="text-secondary">{{ resumen.total_semis_reg|default:0 }}/{{ resumen.total_semis|default:0 }}</h4>
+                    <p class="text-muted small">Semidedicación</p>
+                </div>
+                <div class="col">
+                    <h4 class="text-dark">{{ resumen.total_simples_reg|default:0 }}/{{ resumen.total_simples|default:0 }}</h4>
+                    <p class="text-muted small">Simples</p>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+    </div>
+    {% empty %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No hay cargos activos para mostrar.
+    </div>
+    {% endfor %}
+
+    <div class="card border-primary mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Resumen General</h5>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col">
+                    <h2 class="text-primary">{{ total_departamentos }}</h2>
+                    <p class="text-muted">Departamentos</p>
+                </div>
+                <div class="col">
+                    <h2 class="text-success">{{ total_docentes }}</h2>
+                    <p class="text-muted">Docentes</p>
+                </div>
+                <div class="col">
+                    <h2 class="text-info">{{ resumen_general.total_cargos_reg }}/{{ resumen_general.total_cargos }}</h2>
+                    <p class="text-muted">Cargos Activos</p>
+                </div>
+                <div class="col">
+                    <h2 class="text-secondary">{{ resumen_general.total_exclusivas_reg }}/{{ resumen_general.total_exclusivas }}</h2>
+                    <p class="text-muted">Exclusivas</p>
+                </div>
+                <div class="col">
+                    <h2 class="text-secondary">{{ resumen_general.total_semis_reg }}/{{ resumen_general.total_semis }}</h2>
+                    <p class="text-muted">Semidedicación</p>
+                </div>
+                <div class="col">
+                    <h2 class="text-dark">{{ resumen_general.total_simples_reg }}/{{ resumen_general.total_simples }}</h2>
+                    <p class="text-muted">Simples</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center text-muted mt-4">
+        <small>Reporte generado el {% now "d/m/Y H:i" %}</small>
+    </div>
+</div>
+{% endblock %}

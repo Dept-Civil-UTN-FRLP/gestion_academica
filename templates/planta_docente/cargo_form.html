@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{% if object %}Editar{% else %}Crear{% endif %} Cargo{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:dashboard' %}">Planta Docente</a></li>
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:cargo_list' %}">Cargos</a></li>
+<li class="breadcrumb-item active">{% if object %}Editar{% else %}Crear{% endif %}</li>
+{% endblock %}
+
+{% block page_title %}{% if object %}Editar Cargo{% else %}Nuevo Cargo{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.docente.id_for_label }}" class="form-label">
+                                Docente <span class="text-danger">*</span>
+                            </label>
+                            {{ form.docente|add_class:"form-select" }}
+                            {% if form.docente.errors %}
+                                <div class="text-danger small mt-1">{{ form.docente.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.asignatura.id_for_label }}" class="form-label">
+                                Asignatura <span class="text-danger">*</span>
+                            </label>
+                            {{ form.asignatura|add_class:"form-select" }}
+                            {% if form.asignatura.errors %}
+                                <div class="text-danger small mt-1">{{ form.asignatura.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.categoria.id_for_label }}" class="form-label">
+                                Categoría <span class="text-danger">*</span>
+                            </label>
+                            {{ form.categoria|add_class:"form-select" }}
+                            {% if form.categoria.errors %}
+                                <div class="text-danger small mt-1">{{ form.categoria.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.caracter.id_for_label }}" class="form-label">
+                                Carácter <span class="text-danger">*</span>
+                            </label>
+                            {{ form.caracter|add_class:"form-select" }}
+                            {% if form.caracter.errors %}
+                                <div class="text-danger small mt-1">{{ form.caracter.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.dedicacion.id_for_label }}" class="form-label">
+                                Dedicación <span class="text-danger">*</span>
+                            </label>
+                            {{ form.dedicacion|add_class:"form-select" }}
+                            {% if form.dedicacion.errors %}
+                                <div class="text-danger small mt-1">{{ form.dedicacion.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.cantidad_horas.id_for_label }}" class="form-label">
+                                Cantidad de Horas <span class="text-danger">*</span>
+                            </label>
+                            {{ form.cantidad_horas|add_class:"form-control" }}
+                            {% if form.cantidad_horas.errors %}
+                                <div class="text-danger small mt-1">{{ form.cantidad_horas.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.comision.id_for_label }}" class="form-label">
+                                Comisión <span class="text-danger">*</span>
+                            </label>
+                            {{ form.comision|add_class:"form-control" }}
+                            {% if form.comision.errors %}
+                                <div class="text-danger small mt-1">{{ form.comision.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">
+                                Fecha de Inicio <span class="text-danger">*</span>
+                            </label>
+                            {{ form.fecha_inicio|add_class:"form-control" }}
+                            {% if form.fecha_inicio.errors %}
+                                <div class="text-danger small mt-1">{{ form.fecha_inicio.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.resolucion_alta.id_for_label }}" class="form-label">
+                                Resolución de Alta <span class="text-danger">*</span>
+                            </label>
+                            {{ form.resolucion_alta|add_class:"form-select" }}
+                            {% if form.resolucion_alta.errors %}
+                                <div class="text-danger small mt-1">{{ form.resolucion_alta.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                                Observaciones
+                            </label>
+                            {{ form.observaciones|add_class:"form-control" }}
+                            {% if form.observaciones.errors %}
+                                <div class="text-danger small mt-1">{{ form.observaciones.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Nota:</strong> La fecha de vencimiento se calculará automáticamente según el carácter del cargo.
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% if object %}{% url 'planta_docente:cargo_detail' object.pk %}{% else %}{% url 'planta_docente:cargo_list' %}{% endif %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

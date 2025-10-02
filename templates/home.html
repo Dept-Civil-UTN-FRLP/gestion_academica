@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Inicio - Gestión Académica{% endblock %}
+
+{% block page_title %}Panel de Control{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Docentes</p>
+                        <h3 class="mb-0">245</h3>
+                    </div>
+                    <div class="fs-1 text-primary">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Cargos Activos</p>
+                        <h3 class="mb-0">412</h3>
+                    </div>
+                    <div class="fs-1 text-success">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Equivalencias</p>
+                        <h3 class="mb-0">28</h3>
+                    </div>
+                    <div class="fs-1 text-warning">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Prácticas</p>
+                        <h3 class="mb-0">15</h3>
+                    </div>
+                    <div class="fs-1 text-info">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-calendar-x"></i> Cargos Próximos a Vencer
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Docente</th>
+                                <th>Cargo</th>
+                                <th>Asignatura</th>
+                                <th>Vencimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>García, Juan</td>
+                                <td>Adjunto</td>
+                                <td>Matemática I</td>
+                                <td><span class="badge bg-danger">15 días</span></td>
+                            </tr>
+                            <!-- Más filas -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-list-check"></i> Accesos Rápidos
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'planta_docente:docente_create' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Nuevo Docente
+                    </a>
+                    <a href="{% url 'planta_docente:cargo_create' %}" class="btn btn-outline-success">
+                        <i class="bi bi-plus-circle"></i> Nuevo Cargo
+                    </a>
+                    <a href="#" class="btn btn-outline-info">
+                        <i class="bi bi-plus-circle"></i> Nueva Equivalencia
+                    </a>
+                    <a href="{% url 'planta_docente:reporte_vencimientos' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-file-bar-graph"></i> Ver Reportes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

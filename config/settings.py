@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+from django.contrib.messages import constants as messages
 import os
 from pathlib import Path
 from decouple import config, Csv
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
     'rest_framework',
     'django_filters',
     'apps.core',
@@ -90,6 +92,9 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD', default='your_password'),
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': config('DB_PORT', default='5432'),
+        "OPTIONS": {
+            "options": "-c client_encoding=UTF8"
+        },
     }
 }
 
@@ -213,4 +218,24 @@ LOGGING = {
             'propagate': False,
         },
     },
+}
+
+# Configuración de LOGIN
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
+
+# Formato de fecha en español
+USE_L10N = True
+DATE_FORMAT = 'd/m/Y'
+DATETIME_FORMAT = 'd/m/Y H:i'
+SHORT_DATE_FORMAT = 'd/m/Y'
+
+# Mensajes de Django
+MESSAGE_TAGS = {
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
 }

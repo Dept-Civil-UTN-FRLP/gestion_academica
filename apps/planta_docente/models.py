@@ -45,6 +45,11 @@ class Docente(models.Model):
         if not self.cv_fecha_confirmacion:
             return True
         return date.today() > self.cv_fecha_confirmacion + timedelta(days=365)
+    
+    @property
+    def cargos_activos_count(self):
+        """Cuenta los cargos activos del docente"""
+        return self.cargos.filter(estado='activo').count()
 
 
 class Correo(models.Model):
@@ -109,6 +114,16 @@ class Asignatura(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.carrera.nombre})"
+    
+    @property
+    def cargos_activos_count(self):
+        """Cuenta los cargos activos de la asignatura"""
+        return self.cargo_set.filter(estado='activo').count()
+
+    @property
+    def cargos_activos(self):
+        """Retorna los cargos activos de la asignatura"""
+        return self.cargo_set.filter(estado='activo').select_related('docente')
 
 
 class Resolucion(models.Model):

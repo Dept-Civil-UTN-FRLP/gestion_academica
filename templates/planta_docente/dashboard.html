@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Dashboard - Planta Docente{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active">Planta Docente</li>
+{% endblock %}
+
+{% block page_title %}Planta Docente - Dashboard{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'planta_docente:docente_create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i> Nuevo Docente
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card border-start border-primary border-4">
+            <div class="card-body">
+                <h6 class="text-muted">Total Docentes</h6>
+                <h2 class="mb-0">{{ total_docentes }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card border-start border-success border-4">
+            <div class="card-body">
+                <h6 class="text-muted">Cargos Activos</h6>
+                <h2 class="mb-0">{{ cargos_activos }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card border-start border-warning border-4">
+            <div class="card-body">
+                <h6 class="text-muted">Por Vencer (90 días)</h6>
+                <h2 class="mb-0">{{ cargos_por_vencer }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card border-start border-info border-4">
+            <div class="card-body">
+                <h6 class="text-muted">Asignaturas</h6>
+                <h2 class="mb-0">156</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vencimientos Próximos -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-exclamation-triangle-fill text-warning"></i> Vencimientos Próximos (90 días)</span>
+        <a href="{% url 'planta_docente:reporte_vencimientos' %}" class="btn btn-sm btn-outline-primary">
+            Ver todos
+        </a>
+    </div>
+    <div class="card-body">
+        {% if vencimientos_proximos %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Docente</th>
+                        <th>Cargo</th>
+                        <th>Asignatura</th>
+                        <th>Dedicación</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Días Restantes</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cargo in vencimientos_proximos %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'planta_docente:docente_detail' cargo.docente.pk %}">
+                                {{ cargo.docente.apellido }}, {{ cargo.docente.nombre }}
+                            </a>
+                        </td>
+                        <td>{{ cargo.get_categoria_display }}</td>
+                        <td>{{ cargo.asignatura.nombre }}</td>
+                        <td><span class="badge bg-secondary">{{ cargo.get_dedicacion_display }}</span></td>
+                        <td>{{ cargo.fecha_vencimiento|date:"d/m/Y" }}</td>
+                        <td>
+                            {% with dias_restantes=cargo.fecha_vencimiento|timeuntil %}
+                            {% if "day" in dias_restantes %}
+                                <span class="badge bg-danger">{{ dias_restantes }}</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ dias_restantes }}</span>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <a href="{% url 'planta_docente:cargo_detail' cargo.pk %}" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-success mb-0">
+            <i class="bi bi-check-circle"></i> No hay cargos próximos a vencer en los próximos 90 días.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

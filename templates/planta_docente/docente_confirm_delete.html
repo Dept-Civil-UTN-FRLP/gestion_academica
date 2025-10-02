@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Docente{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:dashboard' %}">Planta Docente</a></li>
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:docente_list' %}">Docentes</a></li>
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:docente_detail' object.pk %}">{{ object.apellido }}</a></li>
+<li class="breadcrumb-item active">Eliminar</li>
+{% endblock %}
+
+{% block page_title %}Eliminar Docente{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Eliminación
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h5><i class="bi bi-exclamation-triangle"></i> ¡Atención!</h5>
+                    <p class="mb-0">
+                        Está a punto de eliminar el siguiente docente. Esta acción no se puede deshacer.
+                    </p>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>{{ object.apellido }}, {{ object.nombre }}</h5>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Documento:</dt>
+                            <dd class="col-sm-8">{{ object.documento }}</dd>
+                            
+                            <dt class="col-sm-4">Legajo:</dt>
+                            <dd class="col-sm-8">{{ object.legajo|default:"Sin legajo" }}</dd>
+                            
+                            <dt class="col-sm-4">Cargos activos:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-warning text-dark">
+                                    {{ object.cargos_activos_count }}
+                                </span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                
+                {% if object.cargos_activos_count > 0 %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <strong>Advertencia:</strong> Este docente tiene {{ object.cargos_activos_count }} cargo(s) activo(s). 
+                    Eliminar el docente también eliminará sus cargos.
+                </div>
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'planta_docente:docente_detail' object.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Sí, Eliminar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

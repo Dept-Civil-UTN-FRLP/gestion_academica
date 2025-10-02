@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ docente.nombre_completo }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:dashboard' %}">Planta Docente</a></li>
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:docente_list' %}">Docentes</a></li>
+<li class="breadcrumb-item active">{{ docente.apellido }}, {{ docente.nombre }}</li>
+{% endblock %}
+
+{% block page_title %}{{ docente.apellido }}, {{ docente.nombre }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'planta_docente:docente_update' docente.pk %}" class="btn btn-warning">
+    <i class="bi bi-pencil"></i> Editar
+</a>
+<a href="{% url 'planta_docente:docente_delete' docente.pk %}" class="btn btn-danger" onclick="return confirm('¿Está seguro?')">
+    <i class="bi bi-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Información Personal -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-person-circle"></i> Información Personal
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Legajo:</dt>
+                    <dd class="col-sm-7">{{ docente.legajo|default:"Sin legajo" }}</dd>
+                    
+                    <dt class="col-sm-5">Documento:</dt>
+                    <dd class="col-sm-7">{{ docente.documento }}</dd>
+                    
+                    <dt class="col-sm-5">Fecha Nac.:</dt>
+                    <dd class="col-sm-7">{{ docente.fecha_nacimiento|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-5">Edad:</dt>
+                    <dd class="col-sm-7">{{ docente.edad }} años</dd>
+                    
+                    <dt class="col-sm-5">CV:</dt>
+                    <dd class="col-sm-7">
+                        {% if docente.cv %}
+                            <a href="{{ docente.cv.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-file-earmark-pdf"></i> Descargar
+                            </a>
+                            {% if docente.cv_requiere_actualizacion %}
+                                <span class="badge bg-warning text-dark">Requiere actualización</span>
+                            {% else %}
+                                <span class="badge bg-success">Actualizado</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">No disponible</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Correos Electrónicos -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-envelope"></i> Correos Electrónicos
+            </div>
+            <div class="card-body">
+                {% if docente.correos.all %}
+                    <ul class="list-unstyled mb-0">
+                        {% for correo in docente.correos.all %}
+                        <li class="mb-2">
+                            <i class="bi bi-envelope-fill text-primary"></i>
+                            <a href="mailto:{{ correo.email }}">{{ correo.email }}</a>
+                            {% if correo.es_principal %}
+                                <span class="badge bg-primary">Principal</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No hay correos registrados</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cargos -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-briefcase-fill"></i> Cargos</span>
+                <a href="{% url 'planta_docente:cargo_create' %}?docente={{ docente.pk }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nuevo Cargo
+                </a>
+            </div>
+            <div class="card-body">
+                {% if cargos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Asignatura</th>
+                                <th>Cargo</th>
+                                <th>Dedicación</th>
+                                <th>Desde</th>
+                                <th>Vencimiento</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cargo in cargos %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'planta_docente:asignatura_detail' cargo.asignatura.pk %}">
+                                        {{ cargo.asignatura.nombre }}
+                                    </a>
+                                    <br>
+                                    <small class="text-muted">{{ cargo.asignatura.carrera.nombre }}</small>
+                                </td>
+                                <td>
+                                    {{ cargo.get_categoria_display }}<br>
+                                    <small class="text-muted">{{ cargo.get_caracter_display }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ cargo.get_dedicacion_display }}
+                                    </span>
+                                    <br>
+                                    <small>{{ cargo.cantidad_horas }}hs</small>
+                                </td>
+                                <td>{{ cargo.fecha_inicio|date:"d/m/Y" }}</td>
+                                <td>
+                                    {{ cargo.fecha_vencimiento|date:"d/m/Y" }}
+                                    {% if cargo.estado == 'activo' %}
+                                        {% if cargo.fecha_vencimiento < today %}
+                                            <br><span class="badge bg-danger">Vencido</span>
+                                        {% elif cargo.fecha_vencimiento < today|add_days:30 %}
+                                            <br><span class="badge bg-warning text-dark">Próximo</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-status-{{ cargo.estado }}">
+                                        {{ cargo.get_estado_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'planta_docente:cargo_detail' cargo.pk %}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if cargo.estado == 'activo' %}
+                                    <a href="{% url 'planta_docente:cargo_update' cargo.pk %}" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Este docente no tiene cargos registrados.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

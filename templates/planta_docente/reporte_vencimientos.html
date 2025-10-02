@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Reporte de Vencimientos{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:dashboard' %}">Planta Docente</a></li>
+<li class="breadcrumb-item active">Reporte de Vencimientos</li>
+{% endblock %}
+
+{% block page_title %}Reporte de Cargos Próximos a Vencer{% endblock %}
+
+{% block page_actions %}
+<button onclick="window.print()" class="btn btn-secondary">
+    <i class="bi bi-printer"></i> Imprimir
+</button>
+<a href="#" class="btn btn-success">
+    <i class="bi bi-file-excel"></i> Exportar Excel
+</a>
+{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        /* Oculta todo por defecto */
+        body * {
+            visibility: hidden;
+        }
+        /* Hace visible solo el área imprimible y sus hijos */
+        .printable-area, .printable-area * {
+            visibility: visible;
+        }
+        /* Asegura que el área ocupe toda la página */
+        .printable-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        /* Oculta explícitamente elementos de la interfaz que no deben imprimirse */
+        .btn, .breadcrumb, .sidebar, .navbar, .page-actions, .page-title-box {
+            display: none !important;
+        }
+    }
+</style>
+
+<div class="printable-area">
+<!-- Cargos Vencidos -->
+{% if vencidos %}
+<div class="card border-danger mb-4">
+    <div class="card-header bg-danger text-white">
+        <i class="bi bi-exclamation-triangle-fill"></i> Cargos Vencidos
+        <span class="badge bg-white text-danger float-end">{{ vencidos.count }}</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Docente</th>
+                        <th>Cargo</th>
+                        <th>Asignatura</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Días Vencido</th>
+                        <th>Resolución</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cargo in vencidos %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'planta_docente:docente_detail' cargo.docente.pk %}">
+                                {{ cargo.docente.apellido }}, {{ cargo.docente.nombre }}
+                            </a>
+                        </td>
+                        <td>{{ cargo.get_categoria_display }}</td>
+                        <td>{{ cargo.asignatura.nombre }}</td>
+                        <td>{{ cargo.fecha_vencimiento|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge bg-danger">
+                                {{ cargo.fecha_vencimiento|timesince }} atrás
+                            </span>
+                        </td>
+                        <td>{{ cargo.resolucion_alta }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Próximos 30 días -->
+{% if proximos_30 %}
+<div class="card border-warning mb-4">
+    <div class="card-header bg-warning">
+        <i class="bi bi-clock"></i> Vencen en los próximos 30 días
+        <span class="badge bg-dark float-end">{{ proximos_30.count }}</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Docente</th>
+                        <th>Cargo</th>
+                        <th>Asignatura</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Días Restantes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cargo in proximos_30 %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'planta_docente:docente_detail' cargo.docente.pk %}">
+                                {{ cargo.docente.apellido }}, {{ cargo.docente.nombre }}
+                            </a>
+                        </td>
+                        <td>{{ cargo.get_categoria_display }}</td>
+                        <td>{{ cargo.asignatura.nombre }}</td>
+                        <td>{{ cargo.fecha_vencimiento|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge bg-warning text-dark">
+                                {{ cargo.fecha_vencimiento|timeuntil }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Próximos 90 días -->
+{% if proximos_90 %}
+<div class="card border-info">
+    <div class="card-header bg-info text-white">
+        <i class="bi bi-calendar-check"></i> Vencen entre 30 y 90 días
+        <span class="badge bg-white text-info float-end">{{ proximos_90.count }}</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Docente</th>
+                        <th>Cargo</th>
+                        <th>Asignatura</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Días Restantes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cargo in proximos_90 %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'planta_docente:docente_detail' cargo.docente.pk %}">
+                                {{ cargo.docente.apellido }}, {{ cargo.docente.nombre }}
+                            </a>
+                        </td>
+                        <td>{{ cargo.get_categoria_display }}</td>
+                        <td>{{ cargo.asignatura.nombre }}</td>
+                        <td>{{ cargo.fecha_vencimiento|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge bg-info">
+                                {{ cargo.fecha_vencimiento|timeuntil }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if not vencidos and not proximos_30 and not proximos_90 %}
+<div class="alert alert-success">
+    <i class="bi bi-check-circle-fill"></i> 
+    <strong>¡Excelente!</strong> No hay cargos próximos a vencer en los próximos 90 días.
+</div>
+{% endif %}
+</div> <!-- Fin printable-area -->
+{% endblock %}

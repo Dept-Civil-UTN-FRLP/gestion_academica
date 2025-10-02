@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ asignatura.nombre }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:dashboard' %}">Planta Docente</a></li>
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:asignatura_list' %}">Asignaturas</a></li>
+<li class="breadcrumb-item active">{{ asignatura.nombre }}</li>
+{% endblock %}
+
+{% block page_title %}{{ asignatura.nombre }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'planta_docente:asignatura_update' asignatura.pk %}" class="btn btn-warning">
+    <i class="bi bi-pencil"></i> Editar
+</a>
+<a href="{% url 'planta_docente:cargo_create' %}?asignatura={{ asignatura.pk }}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i> Nuevo Cargo
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <!-- Información de la Asignatura -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Información General
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Código:</dt>
+                    <dd class="col-sm-7"><code>{{ asignatura.codigo|default:"---" }}</code></dd>
+                    
+                    <dt class="col-sm-5">Carrera:</dt>
+                    <dd class="col-sm-7">{{ asignatura.carrera.nombre }}</dd>
+                    
+                    <dt class="col-sm-5">Departamento:</dt>
+                    <dd class="col-sm-7">{{ asignatura.departamento.nombre }}</dd>
+                    
+                    <dt class="col-sm-5">Nivel:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-info">{{ asignatura.get_nivel_display }}</span>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Tipo:</dt>
+                    <dd class="col-sm-7">
+                        {% if asignatura.es_obligatoria %}
+                            <span class="badge bg-primary">Obligatoria</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Optativa</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Dictado:</dt>
+                    <dd class="col-sm-7">{{ asignatura.get_forma_dictado_display }}</dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Carga Horaria -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-clock"></i> Carga Horaria
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-7">Horas Semanales:</dt>
+                    <dd class="col-sm-5"><strong>{{ asignatura.horas_semanales }}</strong> hs</dd>
+                    
+                    <dt class="col-sm-7">Horas Totales:</dt>
+                    <dd class="col-sm-5"><strong>{{ asignatura.horas_totales }}</strong> hs</dd>
+                    
+                    <dt class="col-sm-7">Puntaje:</dt>
+                    <dd class="col-sm-5"><strong>{{ asignatura.puntaje }}</strong> pts</dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Áreas y Bloques -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-grid-3x3"></i> Clasificación
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Áreas:</strong>
+                    {% if asignatura.areas.all %}
+                        <div class="mt-2">
+                            {% for area in asignatura.areas.all %}
+                                <span class="badge bg-success me-1">{{ area.nombre }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Sin áreas asignadas</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <strong>Bloques:</strong>
+                    {% if asignatura.bloques.all %}
+                        <div class="mt-2">
+                            {% for bloque in asignatura.bloques.all %}
+                                <span class="badge bg-primary me-1">{{ bloque.nombre }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Sin bloques asignados</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <!-- Cargos Activos -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-people-fill"></i> Planta Docente</span>
+                <span class="badge bg-success">{{ cargos_activos.count }} activos</span>
+            </div>
+            <div class="card-body">
+                {% if cargos_activos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Docente</th>
+                                <th>Cargo</th>
+                                <th>Dedicación</th>
+                                <th>Comisión</th>
+                                <th>Desde</th>
+                                <th>Vencimiento</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cargo in cargos_activos %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'planta_docente:docente_detail' cargo.docente.pk %}">
+                                        {{ cargo.docente.apellido }}, {{ cargo.docente.nombre }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ cargo.get_categoria_display }}<br>
+                                    <small class="text-muted">{{ cargo.get_caracter_display }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ cargo.get_dedicacion_display }}</span>
+                                </td>
+                                <td>{{ cargo.comision }}</td>
+                                <td>{{ cargo.fecha_inicio|date:"d/m/Y" }}</td>
+                                <td>
+                                    {{ cargo.fecha_vencimiento|date:"d/m/Y" }}
+                                    {% with dias=cargo.fecha_vencimiento|days_until %}
+                                        {% if dias < 0 %}
+                                            <br><span class="badge bg-danger">Vencido</span>
+                                        {% elif dias < 30 %}
+                                            <br><span class="badge bg-warning text-dark">{{ dias }} días</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'planta_docente:cargo_detail' cargo.pk %}" 
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> No hay docentes asignados a esta asignatura.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

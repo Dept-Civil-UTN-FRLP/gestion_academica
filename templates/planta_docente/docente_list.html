@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+
+{% block title %}Docentes{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'planta_docente:dashboard' %}">Planta Docente</a></li>
+<li class="breadcrumb-item active">Docentes</li>
+{% endblock %}
+
+{% block page_title %}Docentes{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'planta_docente:docente_create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i> Nuevo Docente
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Búsqueda y Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="search" class="form-control" placeholder="Buscar por nombre, apellido, documento o legajo..." value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'planta_docente:docente_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de Docentes -->
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-people-fill"></i> Lista de Docentes
+        <span class="badge bg-primary rounded-pill float-end">{{ page_obj.paginator.count }} total</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Legajo</th>
+                        <th>Apellido y Nombre</th>
+                        <th>Documento</th>
+                        <th>Edad</th>
+                        <th>Cargos Activos</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for docente in docentes %}
+                    <tr>
+                        <td><strong>{{ docente.legajo|default:"Sin legajo" }}</strong></td>
+                        <td>
+                            <a href="{% url 'planta_docente:docente_detail' docente.pk %}">
+                                {{ docente.apellido }}, {{ docente.nombre }}
+                            </a>
+                        </td>
+                        <td>{{ docente.documento }}</td>
+                        <td>{{ docente.edad }} años</td>
+                        <td>
+                            <span class="badge bg-success">
+                                {{ docente.cargos_activos }}
+                            </span>
+                        </td>
+                        <td class="table-actions">
+                            <a href="{% url 'planta_docente:docente_detail' docente.pk %}" class="btn btn-sm btn-outline-info" title="Ver detalle">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'planta_docente:docente_update' docente.pk %}" class="btn btn-sm btn-outline-warning" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'planta_docente:docente_delete' docente.pk %}" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de eliminar este docente?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No se encontraron docentes
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <nav aria-label="Paginación">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
