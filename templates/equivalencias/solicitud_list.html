@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Solicitudes de Equivalencia{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">Equivalencias</li>
+<li class="breadcrumb-item active">Solicitudes</li>
+{% endblock %}
+
+{% block page_title %}Solicitudes de Equivalencia{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'equivalencias:solicitud_create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i> Nueva Solicitud
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="proceso" {% if request.GET.estado == 'proceso' %}selected{% endif %}>
+                        En Proceso
+                    </option>
+                    <option value="completada" {% if request.GET.estado == 'completada' %}selected{% endif %}>
+                        Completada
+                    </option>
+                    <option value="cancelada" {% if request.GET.estado == 'cancelada' %}selected{% endif %}>
+                        Cancelada
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Buscar Estudiante</label>
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Nombre o DNI del estudiante..." 
+                       value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+                <a href="{% url 'equivalencias:solicitud_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de Solicitudes -->
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-list-check"></i> Lista de Solicitudes
+        <span class="badge bg-primary rounded-pill float-end">{{ page_obj.paginator.count }}</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Estudiante</th>
+                        <th>Email</th>
+                        <th>Fecha Inicio</th>
+                        <th>Asignaturas</th>
+                        <th>Progreso</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr>
+                        <td><strong>#{{ solicitud.id }}</strong></td>
+                        <td>
+                            <a href="{% url 'equivalencias:solicitud_detail' solicitud.pk %}">
+                                {{ solicitud.estudiante.nombre_completo }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if solicitud.estudiante.email_estudiante %}
+                                <a href="mailto:{{ solicitud.estudiante.email_estudiante }}">
+                                    {{ solicitud.estudiante.email_estudiante }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ solicitud.fecha_inicio|date:"d/m/Y" }}</td>
+                        <td><span class="badge bg-secondary">{{ solicitud.asignaturas.count }}</span></td>
+                        <td>
+                            <div class="progress" style="height: 20px; min-width: 100px;">
+                                <div class="progress-bar bg-{{ solicitud.estado_general|badge_color }}" 
+                                     role="progressbar" 
+                                     style="width: {{ solicitud.porcentaje_progreso }}%">
+                                    {{ solicitud.progreso }}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ solicitud.estado_general|badge_color }}">
+                                {{ solicitud.get_estado_general_display }}
+                            </span>
+                        </td>
+                        <td class="table-actions">
+                            <a href="{% url 'equivalencias:solicitud_detail' solicitud.pk %}" 
+                               class="btn btn-sm btn-outline-info" title="Ver detalle">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if solicitud.estado_general == 'proceso' %}
+                            <a href="{% url 'equivalencias:solicitud_update' solicitud.pk %}" 
+                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No se encontraron solicitudes
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <nav aria-label="Paginación" class="mt-3">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

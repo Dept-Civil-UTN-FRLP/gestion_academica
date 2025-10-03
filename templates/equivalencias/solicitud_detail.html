@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Solicitud #{{ solicitud.id }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">Equivalencias</li>
+<li class="breadcrumb-item"><a href="{% url 'equivalencias:solicitud_list' %}">Solicitudes</a></li>
+<li class="breadcrumb-item active">#{{ solicitud.id }}</li>
+{% endblock %}
+
+{% block page_title %}Solicitud de Equivalencia #{{ solicitud.id }}{% endblock %}
+
+{% block page_actions %}
+{% if solicitud.estado_general == 'proceso' %}
+<a href="{% url 'equivalencias:solicitud_update' solicitud.pk %}" class="btn btn-warning">
+    <i class="bi bi-pencil"></i> Editar
+</a>
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#completarModal">
+    <i class="bi bi-check-circle"></i> Completar Solicitud
+</button>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Información del Estudiante -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-person-circle"></i> Estudiante
+            </div>
+            <div class="card-body">
+                <h5>{{ solicitud.estudiante.nombre_completo }}</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">DNI:</dt>
+                    <dd class="col-sm-7">{{ solicitud.estudiante.dni_pasaporte|format_dni }}</dd>
+                    
+                    <dt class="col-sm-5">Email:</dt>
+                    <dd class="col-sm-7">
+                        {% if solicitud.estudiante.email_estudiante %}
+                            <a href="mailto:{{ solicitud.estudiante.email_estudiante }}">
+                                {{ solicitud.estudiante.email_estudiante }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No disponible</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Teléfono:</dt>
+                    <dd class="col-sm-7">
+                        {% if solicitud.estudiante.telefono %}
+                            {{ solicitud.estudiante.telefono|format_phone }}
+                        {% else %}
+                            <span class="text-muted">No disponible</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Carrera:</dt>
+                    <dd class="col-sm-7">
+                        {% if solicitud.estudiante.carrera %}
+                            {{ solicitud.estudiante.carrera.nombre }}
+                        {% else %}
+                            <span class="text-muted">No especificada</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Estado de la Solicitud -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Estado de la Solicitud
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Fecha Inicio:</dt>
+                    <dd class="col-sm-7">{{ solicitud.fecha_inicio|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-5">Estado:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-{{ solicitud.estado_general|badge_color }}">
+                            {{ solicitud.get_estado_general_display }}
+                        </span>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Progreso:</dt>
+                    <dd class="col-sm-7">
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-{{ solicitud.estado_general|badge_color }}" 
+                                 role="progressbar" 
+                                 style="width: {{ solicitud.porcentaje_progreso }}%">
+                                {{ solicitud.progreso }}
+                            </div>
+                        </div>
+                    </dd>
+                    
+                    {% if solicitud.fecha_completada %}
+                    <dt class="col-sm-5">Completada:</dt>
+                    <dd class="col-sm-7">{{ solicitud.fecha_completada|date:"d/m/Y" }}</dd>
+                    {% endif %}
+                    
+                    {% if solicitud.acta_firmada %}
+                    <dt class="col-sm-5">Acta:</dt>
+                    <dd class="col-sm-7">
+                        <a href="{{ solicitud.acta_firmada.url }}" target="_blank" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-file-pdf"></i> Ver Acta
+                        </a>
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Asignaturas Solicitadas -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-book-half"></i> Asignaturas Solicitadas
+                <span class="badge bg-primary rounded-pill float-end">
+                    {{ detalles.count }} asignaturas
+                </span>
+            </div>
+            <div class="card-body">
+                {% for detalle in detalles %}
+                <div class="card mb-3 border-start border-{{ detalle.estado_asignatura|badge_color }} border-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0">{{ detalle.asignatura.asignatura.nombre }}</h6>
+                            <span class="badge bg-{{ detalle.estado_asignatura|badge_color }}">
+                                {{ detalle.get_estado_asignatura_display }}
+                            </span>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <i class="bi bi-building"></i> 
+                                    {{ detalle.asignatura.asignatura.departamento.nombre }}
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <i class="bi bi-person"></i> 
+                                    Responsable: {{ detalle.asignatura.docente_responsable.apellido }}
+                                </small>
+                            </div>
+                        </div>
+                        
+                        {% if detalle.fecha_dictamen %}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar-check"></i> 
+                                Dictaminada: {{ detalle.fecha_dictamen|date:"d/m/Y" }}
+                            </small>
+                        </div>
+                        {% endif %}
+                        
+                        {% if detalle.detalle_pc %}
+                        <div class="alert alert-warning mt-2 mb-0">
+                            <strong><i class="bi bi-exclamation-triangle"></i> Programa Complementario:</strong><br>
+                            {{ detalle.detalle_pc }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if detalle.observaciones_docente %}
+                        <div class="mt-2">
+                            <small><strong>Observaciones:</strong> {{ detalle.observaciones_docente }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="alert alert-info mb-0">
+                    No hay asignaturas asociadas a esta solicitud.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Documentos Adjuntos -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-paperclip"></i> Documentos Adjuntos
+                <span class="badge bg-secondary rounded-pill float-end">
+                    {{ documentos.count }}
+                </span>
+            </div>
+            <div class="card-body">
+                {% if documentos %}
+                <div class="list-group">
+                    {% for documento in documentos %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark-pdf text-danger"></i>
+                            <strong>{{ documento.nombre_archivo }}</strong>
+                            {% if documento.descripcion %}
+                                <br><small class="text-muted">{{ documento.descripcion }}</small>
+                            {% endif %}
+                            <br><small class="text-muted">
+                                Cargado: {{ documento.fecha_carga|date:"d/m/Y H:i" }}
+                            </small>
+                        </div>
+                        <a href="{{ documento.archivo.url }}" target="_blank" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download"></i> Descargar
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> No hay documentos adjuntos.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Completar Solicitud -->
+<div class="modal fade" id="completarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Completar Solicitud</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'equivalencias:solicitud_completar' solicitud.pk %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        ¿Está seguro de completar esta solicitud? Esta acción no se puede deshacer.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Acta Firmada (PDF) <span class="text-danger">*</span></label>
+                        <input type="file" name="acta_firmada" class="form-control" accept=".pdf" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Completar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

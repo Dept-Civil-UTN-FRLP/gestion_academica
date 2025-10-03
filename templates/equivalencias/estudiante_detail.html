@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ estudiante.nombre_completo }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">Equivalencias</li>
+<li class="breadcrumb-item"><a href="{% url 'equivalencias:estudiante_list' %}">Estudiantes</a></li>
+<li class="breadcrumb-item active">{{ estudiante.nombre_completo }}</li>
+{% endblock %}
+
+{% block page_title %}{{ estudiante.nombre_completo }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'equivalencias:estudiante_update' estudiante.pk %}" class="btn btn-warning">
+    <i class="bi bi-pencil"></i> Editar
+</a>
+<a href="{% url 'equivalencias:solicitud_create' %}?estudiante={{ estudiante.pk }}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i> Nueva Solicitud
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-person-circle"></i> Información del Estudiante
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">DNI:</dt>
+                    <dd class="col-sm-7">{{ estudiante.dni_pasaporte|format_dni|default:"No especificado" }}</dd>
+                    
+                    <dt class="col-sm-5">Email:</dt>
+                    <dd class="col-sm-7">
+                        {% if estudiante.email_estudiante %}
+                            <a href="mailto:{{ estudiante.email_estudiante }}">
+                                {{ estudiante.email_estudiante }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No especificado</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Teléfono:</dt>
+                    <dd class="col-sm-7">
+                        {% if estudiante.telefono %}
+                            {{ estudiante.telefono|format_phone }}
+                        {% else %}
+                            <span class="text-muted">No especificado</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Carrera:</dt>
+                    <dd class="col-sm-7">
+                        {% if estudiante.carrera %}
+                            {{ estudiante.carrera.nombre }}
+                        {% else %}
+                            <span class="text-muted">No especificada</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Registrado:</dt>
+                    <dd class="col-sm-7">{{ estudiante.fecha_creacion|date:"d/m/Y" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-list-check"></i> Solicitudes de Equivalencia</span>
+                <span class="badge bg-primary">{{ solicitudes.count }}</span>
+            </div>
+            <div class="card-body">
+                {% if solicitudes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Asignaturas</th>
+                                <th>Progreso</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for solicitud in solicitudes %}
+                            <tr>
+                                <td><strong>#{{ solicitud.id }}</strong></td>
+                                <td>{{ solicitud.fecha_inicio|date:"d/m/Y" }}</td>
+                                <td>{{ solicitud.asignaturas.count }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-{{ solicitud.estado_general|badge_color }}" 
+                                             role="progressbar" 
+                                             style="width: {{ solicitud.porcentaje_progreso }}%">
+                                            {{ solicitud.progreso }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ solicitud.estado_general|badge_color }}">
+                                        {{ solicitud.get_estado_general_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'equivalencias:solicitud_detail' solicitud.pk %}" 
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Este estudiante no tiene solicitudes de equivalencia.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

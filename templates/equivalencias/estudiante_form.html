@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{% if object %}Editar{% else %}Crear{% endif %} Estudiante{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">Equivalencias</li>
+<li class="breadcrumb-item"><a href="{% url 'equivalencias:estudiante_list' %}">Estudiantes</a></li>
+<li class="breadcrumb-item active">{% if object %}Editar{% else %}Crear{% endif %}</li>
+{% endblock %}
+
+{% block page_title %}{% if object %}Editar Estudiante{% else %}Nuevo Estudiante{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.nombre_completo.id_for_label }}" class="form-label">
+                                Nombre Completo <span class="text-danger">*</span>
+                            </label>
+                            {{ form.nombre_completo|add_class:"form-control" }}
+                            {% if form.nombre_completo.errors %}
+                                <div class="text-danger small mt-1">{{ form.nombre_completo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.dni_pasaporte.id_for_label }}" class="form-label">
+                                DNI/Pasaporte
+                            </label>
+                            {{ form.dni_pasaporte|add_class:"form-control" }}
+                            {% if form.dni_pasaporte.errors %}
+                                <div class="text-danger small mt-1">{{ form.dni_pasaporte.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telefono.id_for_label }}" class="form-label">
+                                Teléfono
+                            </label>
+                            {{ form.telefono|add_class:"form-control" }}
+                            {% if form.telefono.errors %}
+                                <div class="text-danger small mt-1">{{ form.telefono.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email_estudiante.id_for_label }}" class="form-label">
+                                Email
+                            </label>
+                            {{ form.email_estudiante|add_class:"form-control" }}
+                            {% if form.email_estudiante.errors %}
+                                <div class="text-danger small mt-1">{{ form.email_estudiante.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.carrera.id_for_label }}" class="form-label">
+                                Carrera
+                            </label>
+                            {{ form.carrera|add_class:"form-select" }}
+                            {% if form.carrera.errors %}
+                                <div class="text-danger small mt-1">{{ form.carrera.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% if object %}{% url 'equivalencias:estudiante_detail' object.pk %}{% else %}{% url 'equivalencias:estudiante_list' %}{% endif %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
