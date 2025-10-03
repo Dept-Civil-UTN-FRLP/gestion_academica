@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Práctica #{{ solicitud.id }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">Práctica Supervisada</li>
+<li class="breadcrumb-item"><a href="{% url 'practica_supervisada:solicitud_list' %}">Solicitudes</a></li>
+<li class="breadcrumb-item active">#{{ solicitud.id }}</li>
+{% endblock %}
+
+{% block page_title %}Práctica Supervisada #{{ solicitud.id }}{% endblock %}
+
+{% block page_actions %}
+{% if solicitud.estado_general != 'completada' %}
+<a href="{% url 'practica_supervisada:solicitud_update' solicitud.pk %}" class="btn btn-warning">
+    <i class="bi bi-pencil"></i> Editar
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <!-- Información del Estudiante -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-person-circle"></i> Estudiante
+            </div>
+            <div class="card-body">
+                <h5>{{ solicitud.estudiante.nombre_completo }}</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Email:</dt>
+                    <dd class="col-sm-7">
+                        {% if solicitud.estudiante.email_estudiante %}
+                            <a href="mailto:{{ solicitud.estudiante.email_estudiante }}">
+                                {{ solicitud.estudiante.email_estudiante }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Carrera:</dt>
+                    <dd class="col-sm-7">
+                        {{ solicitud.estudiante.carrera.nombre|default:"-" }}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Estado -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Estado
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-6">Fecha Solicitud:</dt>
+                    <dd class="col-sm-6">{{ solicitud.fecha_solicitud|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-6">Estado:</dt>
+                    <dd class="col-sm-6">
+                        <span class="badge bg-{{ solicitud.estado_general|badge_color }}">
+                            {{ solicitud.get_estado_general_display }}
+                        </span>
+                    </dd>
+                    
+                    {% if solicitud.fecha_aprobacion_plan %}
+                    <dt class="col-sm-6">Plan Aprobado:</dt>
+                    <dd class="col-sm-6">{{ solicitud.fecha_aprobacion_plan|date:"d/m/Y" }}</dd>
+                    {% endif %}
+                    
+                    {% if solicitud.fecha_completada %}
+                    <dt class="col-sm-6">Completada:</dt>
+                    <dd class="col-sm-6">{{ solicitud.fecha_completada|date:"d/m/Y" }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <!-- Detalles de la Práctica -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-clipboard-data"></i> Detalles de la Práctica
+            </div>
+            <div class="card-body">
+                <h5>{{ solicitud.tema }}</h5>
+                
+                {% if solicitud.descripcion %}
+                <p class="text-muted">{{ solicitud.descripcion }}</p>
+                {% endif %}
+                
+                <dl class="row">
+                    <dt class="col-sm-4">Tutor:</dt>
+                    <dd class="col-sm-8">
+                        <a href="{% url 'planta_docente:docente_detail' solicitud.tutor.pk %}">
+                            {{ solicitud.tutor.apellido }}, {{ solicitud.tutor.nombre }}
+                        </a>
+                    </dd>
+                    
+                    {% if solicitud.supervisor %}
+                    <dt class="col-sm-4">Supervisor:</dt>
+                    <dd class="col-sm-8">{{ solicitud.supervisor }}</dd>
+                    {% endif %}
+                    
+                    {% if solicitud.empresa_institucion %}
+                    <dt class="col-sm-4">Empresa/Institución:</dt>
+                    <dd class="col-sm-8">{{ solicitud.empresa_institucion }}</dd>
+                    {% endif %}
+                    
+                    <dt class="col-sm-4">Etiquetas:</dt>
+                    <dd class="col-sm-8">
+                        {% if solicitud.etiquetas.all %}
+                            {% for etiqueta in solicitud.etiquetas.all %}
+                                <span class="badge" style="background-color: {{ etiqueta.color }};">
+                                    {{ etiqueta.nombre }}
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">Sin etiquetas</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+                
+                <!-- Archivos -->
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <strong>Plan de Trabajo:</strong><br>
+                        {% if solicitud.plan_trabajo %}
+                            <a href="{{ solicitud.plan_trabajo.url }}" target="_blank" 
+                               class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="bi bi-file-pdf"></i> Ver Plan
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No disponible</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <strong>Informe Final:</strong><br>
+                        {% if solicitud.informe_final %}
+                            <a href="{{ solicitud.informe_final.url }}" target="_blank" 
+                               class="btn btn-sm btn-outline-success mt-2">
+                                <i class="bi bi-file-pdf"></i> Ver Informe
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No disponible</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Jurados -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-people-fill"></i> Jurados Evaluadores
+                <span class="badge bg-secondary float-end">{{ jurados.count }}</span>
+            </div>
+            <div class="card-body">
+                {% if jurados %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Jurado</th>
+                                <th>Dictamen Plan</th>
+                                <th>Dictamen Informe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for jurado in jurados %}
+                            <tr>
+                                <td>
+                                    {% if jurado.docente %}
+                                        {{ jurado.docente.apellido }}, {{ jurado.docente.nombre }}
+                                    {% else %}
+                                        {{ jurado.nombre_externo }}
+                                        {% if jurado.institucion_externa %}
+                                            <br><small class="text-muted">{{ jurado.institucion_externa }}</small>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ jurado.estado_dictamen_plan|badge_color }}">
+                                        {{ jurado.get_estado_dictamen_plan_display }}
+                                    </span>
+                                    {% if jurado.observaciones_plan %}
+                                        <br><small>{{ jurado.observaciones_plan|truncate_chars:50 }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ jurado.estado_dictamen_informe|badge_color }}">
+                                        {{ jurado.get_estado_dictamen_informe_display }}
+                                    </span>
+                                    {% if jurado.observaciones_informe %}
+                                        <br><small>{{ jurado.observaciones_informe|truncate_chars:50 }}</small>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> No hay jurados asignados.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
