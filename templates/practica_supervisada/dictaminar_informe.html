@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Dictaminar Informe Final{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">Práctica Supervisada</li>
+<li class="breadcrumb-item"><a href="{% url 'practica_supervisada:solicitud_list' %}">Solicitudes</a></li>
+<li class="breadcrumb-item"><a href="{% url 'practica_supervisada:solicitud_detail' object.solicitud.pk %}">#{{ object.solicitud.id }}</a></li>
+<li class="breadcrumb-item active">Dictaminar Informe</li>
+{% endblock %}
+
+{% block page_title %}Dictaminar Informe Final{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Info de la Práctica -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-info-circle"></i> Información de la Práctica
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Estudiante:</dt>
+                    <dd class="col-sm-8">{{ object.solicitud.estudiante.nombre_completo }}</dd>
+                    
+                    <dt class="col-sm-4">Tema:</dt>
+                    <dd class="col-sm-8">{{ object.solicitud.tema }}</dd>
+                    
+                    <dt class="col-sm-4">Tutor:</dt>
+                    <dd class="col-sm-8">{{ object.solicitud.tutor.apellido }}, {{ object.solicitud.tutor.nombre }}</dd>
+                    
+                    <dt class="col-sm-4">Informe Final:</dt>
+                    <dd class="col-sm-8">
+                        {% if object.solicitud.informe_final %}
+                            <a href="{{ object.solicitud.informe_final.url }}" target="_blank" 
+                               class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-file-pdf"></i> Ver Informe
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No disponible</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Formulario de Dictamen -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clipboard-check"></i> Dictamen del Informe Final
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.estado_dictamen_informe.id_for_label }}" class="form-label">
+                            Dictamen <span class="text-danger">*</span>
+                        </label>
+                        {{ form.estado_dictamen_informe|add_class:"form-select" }}
+                        {% if form.estado_dictamen_informe.errors %}
+                            <div class="text-danger small mt-1">{{ form.estado_dictamen_informe.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.observaciones_informe.id_for_label }}" class="form-label">
+                            Observaciones <span class="text-danger">*</span>
+                        </label>
+                        {{ form.observaciones_informe|add_class:"form-control" }}
+                        <small class="text-muted">
+                            Evaluación del trabajo realizado, resultados obtenidos y cumplimiento de objetivos.
+                        </small>
+                        {% if form.observaciones_informe.errors %}
+                            <div class="text-danger small mt-1">{{ form.observaciones_informe.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        Si todos los jurados aprueban el informe, la práctica supervisada se marcará como completada automáticamente.
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'practica_supervisada:solicitud_detail' object.solicitud.pk %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-send"></i> Enviar Dictamen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
