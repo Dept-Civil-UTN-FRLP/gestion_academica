@@ -36,7 +36,7 @@ urlpatterns = [
     # Módulos de la aplicación
     path('planta-docente/', include('apps.planta_docente.urls')),
     path('equivalencias/', include('apps.equivalencias.urls')),
-    #path('practica-supervisada/', include('apps.practica_supervisada.urls')),
+    path('practica-supervisada/', include('apps.practica_supervisada.urls')),
     path('carrera-academica/', include('apps.carrera_academica.urls')),
 
     # API REST (opcional)

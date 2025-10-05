@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Carrera Académica - {{ carrera.numero_expediente }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'carrera_academica:dashboard' %}">Carrera Académica</a></li>
+<li class="breadcrumb-item"><a href="{% url 'carrera_academica:carrera_list' %}">Carreras</a></li>
+<li class="breadcrumb-item active">{{ carrera.numero_expediente }}</li>
+{% endblock %}
+
+{% block page_title %}Carrera Académica - {{ carrera.numero_expediente }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'carrera_academica:carrera_update' carrera.pk %}" class="btn btn-warning">
+    <i class="bi bi-pencil"></i> Editar
+</a>
+<a href="{% url 'carrera_academica:evaluacion_create' carrera.pk %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i> Nueva Evaluación
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Información del Docente y Cargo -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-person-circle"></i> Docente
+            </div>
+            <div class="card-body">
+                <h5>
+                    <a href="{% url 'planta_docente:docente_detail' carrera.cargo.docente.pk %}">
+                        {{ carrera.cargo.docente.apellido }}, {{ carrera.cargo.docente.nombre }}
+                    </a>
+                </h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Legajo:</dt>
+                    <dd class="col-sm-7">{{ carrera.cargo.docente.legajo|default:"-" }}</dd>
+                    
+                    <dt class="col-sm-5">Cargo:</dt>
+                    <dd class="col-sm-7">{{ carrera.cargo.get_categoria_display }}</dd>
+                    
+                    <dt class="col-sm-5">Asignatura:</dt>
+                    <dd class="col-sm-7">{{ carrera.cargo.asignatura.nombre }}</dd>
+                    
+                    <dt class="col-sm-5">Dedicación:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-secondary">{{ carrera.cargo.get_dedicacion_display }}</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Estado de la Carrera -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Estado
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-6">Estado:</dt>
+                    <dd class="col-sm-6">
+                        <span class="badge bg-{{ carrera.estado|badge_color }}">
+                            {{ carrera.get_estado_display }}
+                        </span>
+                    </dd>
+                    
+                    <dt class="col-sm-6">Años Activa:</dt>
+                    <dd class="col-sm-6">{{ carrera.anios_activa }} años</dd>
+                    
+                    <dt class="col-sm-6">Fecha Inicio:</dt>
+                    <dd class="col-sm-6">{{ carrera.fecha_inicio|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-6">Venc. Original:</dt>
+                    <dd class="col-sm-6">{{ carrera.fecha_vencimiento_original|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-6">Venc. Actual:</dt>
+                    <dd class="col-sm-6">
+                        {{ carrera.fecha_vencimiento_actual|date:"d/m/Y" }}
+                        {% with dias=carrera.dias_hasta_vencimiento %}
+                            {% if dias < 0 %}
+                                <br><span class="badge bg-danger">Vencida</span>
+                            {% elif dias < 180 %}
+                                <br><span class="badge bg-warning text-dark">{{ dias }} días</span>
+                            {% endif %}
+                        {% endwith %}
+                    </dd>
+                    
+                    {% if carrera.fecha_finalizacion %}
+                    <dt class="col-sm-6">Finalizada:</dt>
+                    <dd class="col-sm-6">{{ carrera.fecha_finalizacion|date:"d/m/Y" }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Resoluciones -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-file-earmark-text"></i> Resoluciones
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Designación:</dt>
+                    <dd class="col-sm-7">{{ carrera.resolucion_designacion }}</dd>
+                    
+                    <dt class="col-sm-5">Puesta en Función:</dt>
+                    <dd class="col-sm-7">{{ carrera.resolucion_puesta_en_funcion }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <!-- Junta Evaluadora -->
+        {% if junta %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-people-fill"></i> Junta Evaluadora
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Titulares:</strong>
+                        <ul class="list-unstyled mt-2">
+                            <li>
+                                <i class="bi bi-person-badge"></i>
+                                {% if junta.titular_frlp %}
+                                    {{ junta.titular_frlp.apellido }}, {{ junta.titular_frlp.nombre }} (FRLP)
+                                {% else %}
+                                    <span class="text-muted">No asignado</span>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <i class="bi bi-person-badge"></i> {{ junta.titular_externo1 }}
+                                {% if junta.institucion_externo1 %}
+                                    <br><small class="text-muted">{{ junta.institucion_externo1 }}</small>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <i class="bi bi-person-badge"></i> {{ junta.titular_externo2 }}
+                                {% if junta.institucion_externo2 %}
+                                    <br><small class="text-muted">{{ junta.institucion_externo2 }}</small>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <strong>Suplentes:</strong>
+                        <ul class="list-unstyled mt-2">
+                            <li>
+                                <i class="bi bi-person"></i>
+                                {% if junta.suplente_frlp %}
+                                    {{ junta.suplente_frlp.apellido }}, {{ junta.suplente_frlp.nombre }} (FRLP)
+                                {% else %}
+                                    <span class="text-muted">No asignado</span>
+                                {% endif %}
+                            </li>
+                            {% if junta.suplente_externo %}
+                            <li>
+                                <i class="bi bi-person"></i> {{ junta.suplente_externo }}
+                                {% if junta.institucion_suplente_externo %}
+                                    <br><small class="text-muted">{{ junta.institucion_suplente_externo }}</small>
+                                {% endif %}
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                
+                {% if junta.veedor_alumno or junta.veedor_graduado %}
+                <hr>
+                <div class="row">
+                    {% if junta.veedor_alumno %}
+                    <div class="col-md-6">
+                        <strong>Veedor Alumno:</strong><br>
+                        <i class="bi bi-eye"></i> {{ junta.veedor_alumno }}
+                    </div>
+                    {% endif %}
+                    {% if junta.veedor_graduado %}
+                    <div class="col-md-6">
+                        <strong>Veedor Graduado:</strong><br>
+                        <i class="bi bi-eye"></i> {{ junta.veedor_graduado }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <p class="text-muted mb-0 mt-3">
+                    <small>Conformada el: {{ junta.fecha_conformacion|date:"d/m/Y" }}</small>
+                </p>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning mb-4">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Atención:</strong> No se ha conformado la junta evaluadora.
+        </div>
+        {% endif %}
+        
+        <!-- Evaluaciones -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clipboard-check"></i> Evaluaciones</span>
+                <span class="badge bg-primary">{{ evaluaciones.count }}</span>
+            </div>
+            <div class="card-body">
+                {% if evaluaciones %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Fecha</th>
+                                <th>Años Evaluados</th>
+                                <th>Estado</th>
+                                <th>Calificación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for evaluacion in evaluaciones %}
+                            <tr>
+                                <td><strong>{{ evaluacion.numero_evaluacion }}</strong></td>
+                                <td>{{ evaluacion.fecha_iniciada|date:"d/m/Y" }}</td>
+                                <td>{{ evaluacion.anios_evaluados|join:", " }}</td>
+                                <td>
+                                    <span class="badge bg-{{ evaluacion.estado|badge_color }}">
+                                        {{ evaluacion.get_estado_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if evaluacion.calificacion %}
+                                        <span class="badge bg-success">
+                                            {{ evaluacion.get_calificacion_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'carrera_academica:evaluacion_detail' evaluacion.pk %}" 
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> No hay evaluaciones registradas.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Formularios Recientes -->
+        {% if formularios_recientes %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <i class="bi bi-files"></i> Formularios Recientes
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for formulario in formularios_recientes %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ formulario.get_tipo_display }}</strong>
+                                {% if formulario.anio_actividad %}
+                                    - Año {{ formulario.anio_actividad }}
+                                {% endif %}
+                                <br>
+                                <small class="text-muted">
+                                    Entregado: {{ formulario.fecha_entrega|date:"d/m/Y" }}
+                                </small>
+                            </div>
+                            <a href="{{ formulario.archivo.url }}" target="_blank" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if carrera.observaciones %}
+<div class="card mt-3">
+    <div class="card-header">
+        <i class="bi bi-chat-left-text"></i> Observaciones
+    </div>
+    <div class="card-body">
+        <p class="mb-0">{{ carrera.observaciones }}</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Nueva Evaluación{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'carrera_academica:dashboard' %}">Carrera Académica</a></li>
+<li class="breadcrumb-item"><a href="{% url 'carrera_academica:carrera_list' %}">Carreras</a></li>
+<li class="breadcrumb-item"><a href="{% url 'carrera_academica:carrera_detail' carrera.pk %}">{{ carrera.numero_expediente }}</a></li>
+<li class="breadcrumb-item active">Nueva Evaluación</li>
+{% endblock %}
+
+{% block page_title %}Nueva Evaluación - {{ carrera.numero_expediente }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-person-circle"></i> Docente
+            </div>
+            <div class="card-body">
+                <h5>{{ carrera.cargo.docente.apellido }}, {{ carrera.cargo.docente.nombre }}</h5>
+                <p class="text-muted mb-0">
+                    {{ carrera.cargo.get_categoria_display }} - {{ carrera.cargo.asignatura.nombre }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.numero_evaluacion.id_for_label }}" class="form-label">
+                                Número de Evaluación <span class="text-danger">*</span>
+                            </label>
+                            {{ form.numero_evaluacion|add_class:"form-control" }}
+                            <small class="text-muted">Ejemplo: 1, 2, 3...</small>
+                            {% if form.numero_evaluacion.errors %}
+                                <div class="text-danger small mt-1">{{ form.numero_evaluacion.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.fecha_iniciada.id_for_label }}" class="form-label">
+                                Fecha de Inicio <span class="text-danger">*</span>
+                            </label>
+                            {{ form.fecha_iniciada|add_class:"form-control" }}
+                            {% if form.fecha_iniciada.errors %}
+                                <div class="text-danger small mt-1">{{ form.fecha_iniciada.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.anios_evaluados.id_for_label }}" class="form-label">
+                                Años Evaluados <span class="text-danger">*</span>
+                            </label>
+                            {{ form.anios_evaluados|add_class:"form-control" }}
+                            <small class="text-muted">
+                                Formato JSON: [2022, 2023] o [2024]
+                            </small>
+                            {% if form.anios_evaluados.errors %}
+                                <div class="text-danger small mt-1">{{ form.anios_evaluados.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                                Observaciones
+                            </label>
+                            {{ form.observaciones|add_class:"form-control" }}
+                            {% if form.observaciones.errors %}
+                                <div class="text-danger small mt-1">{{ form.observaciones.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Nota:</strong> Una vez creada la evaluación, podrá subir los formularios requeridos (F01-F13, CV, ENC).
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'carrera_academica:carrera_detail' carrera.pk %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Crear Evaluación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
