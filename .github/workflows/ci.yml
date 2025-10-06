@@ -50,6 +50,7 @@ jobs:
       - name: Ejecutar Pruebas
         # Aquí inyectamos las variables de entorno para el CI
         env:
+          ALLOWED_HOSTS: 'localhost,127.0.0.1'
           # Usa el secreto que creaste en GitHub
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           DEBUG: 'True'
