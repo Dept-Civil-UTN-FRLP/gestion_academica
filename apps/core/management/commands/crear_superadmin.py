@@ -4,12 +4,12 @@ from apps.usuarios.models import UserProfile
 
 
 class Command(BaseCommand):
-    help = 'Crea un superusuario con perfil de superadmin'
+    help = "Crea un superusuario con perfil de superadmin"
 
     def handle(self, *args, **options):
-        username = input('Username: ')
-        email = input('Email: ')
-        password = input('Password: ')
+        username = input("Username: ")
+        email = input("Email: ")
+        password = input("Password: ")
 
         user = User.objects.create_superuser(username, email, password)
         profile, created = UserProfile.objects.get_or_create(user=user)

@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -23,32 +24,29 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     # Admin de Django
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     # Página principal
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
-
+    path("", TemplateView.as_view(template_name="home.html"), name="home"),
     # Autenticación
-    path('accounts/login/', auth_views.LoginView.as_view(
-        template_name='registration/login.html'), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-
+    path(
+        "accounts/login/",
+        auth_views.LoginView.as_view(template_name="registration/login.html"),
+        name="login",
+    ),
+    path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     # Módulos de la aplicación
-    path('planta-docente/', include('apps.planta_docente.urls')),
-    path('equivalencias/', include('apps.equivalencias.urls')),
-    path('practica-supervisada/', include('apps.practica_supervisada.urls')),
-    path('carrera-academica/', include('apps.carrera_academica.urls')),
-
+    path("planta-docente/", include("apps.planta_docente.urls")),
+    path("equivalencias/", include("apps.equivalencias.urls")),
+    path("practica-supervisada/", include("apps.practica_supervisada.urls")),
+    path("carrera-academica/", include("apps.carrera_academica.urls")),
     # API REST (opcional)
-    #path('api/', include('apps.api.urls')),
+    # path('api/', include('apps.api.urls')),
 ]
 
 # Servir archivos media en desarrollo
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Personalizar títulos del admin
 admin.site.site_header = "Gestión Académica - Administración"

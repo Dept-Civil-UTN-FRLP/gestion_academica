@@ -8,59 +8,103 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Area',
+            name="Area",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(max_length=100, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name': 'Área',
-                'verbose_name_plural': 'Áreas',
-                'ordering': ['nombre'],
+                "verbose_name": "Área",
+                "verbose_name_plural": "Áreas",
+                "ordering": ["nombre"],
             },
         ),
         migrations.CreateModel(
-            name='Bloque',
+            name="Bloque",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(max_length=100, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name': 'Bloque',
-                'verbose_name_plural': 'Bloques',
-                'ordering': ['nombre'],
+                "verbose_name": "Bloque",
+                "verbose_name_plural": "Bloques",
+                "ordering": ["nombre"],
             },
         ),
         migrations.CreateModel(
-            name='Departamento',
+            name="Departamento",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(max_length=100, unique=True)),
-                ('codigo', models.CharField(blank=True, max_length=20, null=True, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=100, unique=True)),
+                (
+                    "codigo",
+                    models.CharField(blank=True, max_length=20, null=True, unique=True),
+                ),
             ],
             options={
-                'verbose_name': 'Departamento',
-                'verbose_name_plural': 'Departamentos',
-                'ordering': ['nombre'],
+                "verbose_name": "Departamento",
+                "verbose_name_plural": "Departamentos",
+                "ordering": ["nombre"],
             },
         ),
         migrations.CreateModel(
-            name='Carrera',
+            name="Carrera",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(max_length=100, unique=True)),
-                ('codigo', models.CharField(blank=True, max_length=20, null=True, unique=True)),
-                ('departamento_cabecera', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='carreras', to='core.departamento')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=100, unique=True)),
+                (
+                    "codigo",
+                    models.CharField(blank=True, max_length=20, null=True, unique=True),
+                ),
+                (
+                    "departamento_cabecera",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="carreras",
+                        to="core.departamento",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Carrera',
-                'verbose_name_plural': 'Carreras',
-                'ordering': ['nombre'],
+                "verbose_name": "Carrera",
+                "verbose_name_plural": "Carreras",
+                "ordering": ["nombre"],
             },
         ),
     ]

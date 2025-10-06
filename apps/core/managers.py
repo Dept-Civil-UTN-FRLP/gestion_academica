@@ -10,11 +10,11 @@ class DepartamentoFilterManager(models.Manager):
             return self.none()
 
         # Superadmin ve todo
-        if hasattr(user, 'profile') and user.profile.es_superadmin:
+        if hasattr(user, "profile") and user.profile.es_superadmin:
             return self.all()
 
         # Filtrar por departamentos asignados
-        if hasattr(user, 'profile'):
+        if hasattr(user, "profile"):
             return self.filter(departamento__in=user.profile.departamentos.all())
 
         return self.none()

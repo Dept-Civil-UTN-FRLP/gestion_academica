@@ -9,91 +9,255 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('planta_docente', '0001_initial'),
+        ("planta_docente", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CarreraAcademica',
+            name="CarreraAcademica",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('numero_expediente', models.CharField(max_length=100, unique=True)),
-                ('fecha_inicio', models.DateField()),
-                ('fecha_vencimiento_original', models.DateField()),
-                ('fecha_vencimiento_actual', models.DateField()),
-                ('estado', models.CharField(choices=[('activa', 'Activa'), ('licencia', 'En Standby/Licencia'), ('finalizada', 'Finalizada')], default='activa', max_length=20)),
-                ('resolucion_designacion', models.CharField(max_length=100)),
-                ('resolucion_puesta_en_funcion', models.CharField(max_length=100)),
-                ('fecha_finalizacion', models.DateField(blank=True, null=True)),
-                ('observaciones', models.TextField(blank=True)),
-                ('cargo', models.OneToOneField(limit_choices_to={'caracter__in': ['regular', 'ordinario']}, on_delete=django.db.models.deletion.CASCADE, to='planta_docente.cargo')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("numero_expediente", models.CharField(max_length=100, unique=True)),
+                ("fecha_inicio", models.DateField()),
+                ("fecha_vencimiento_original", models.DateField()),
+                ("fecha_vencimiento_actual", models.DateField()),
+                (
+                    "estado",
+                    models.CharField(
+                        choices=[
+                            ("activa", "Activa"),
+                            ("licencia", "En Standby/Licencia"),
+                            ("finalizada", "Finalizada"),
+                        ],
+                        default="activa",
+                        max_length=20,
+                    ),
+                ),
+                ("resolucion_designacion", models.CharField(max_length=100)),
+                ("resolucion_puesta_en_funcion", models.CharField(max_length=100)),
+                ("fecha_finalizacion", models.DateField(blank=True, null=True)),
+                ("observaciones", models.TextField(blank=True)),
+                (
+                    "cargo",
+                    models.OneToOneField(
+                        limit_choices_to={"caracter__in": ["regular", "ordinario"]},
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="planta_docente.cargo",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Carrera Académica',
-                'verbose_name_plural': 'Carreras Académicas',
-                'ordering': ['-fecha_inicio'],
+                "verbose_name": "Carrera Académica",
+                "verbose_name_plural": "Carreras Académicas",
+                "ordering": ["-fecha_inicio"],
             },
         ),
         migrations.CreateModel(
-            name='Evaluacion',
+            name="Evaluacion",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('numero_evaluacion', models.PositiveIntegerField()),
-                ('fecha_iniciada', models.DateField()),
-                ('fecha_evaluacion', models.DateField(blank=True, null=True)),
-                ('anios_evaluados', models.JSONField(help_text='Lista de años evaluados, ej: [2022, 2023]')),
-                ('estado', models.CharField(choices=[('pendiente', 'Pendiente'), ('en_proceso', 'En Proceso'), ('completada', 'Completada')], default='pendiente', max_length=30)),
-                ('calificacion', models.CharField(blank=True, choices=[('insuficiente', 'Insuficiente'), ('suficiente', 'Suficiente'), ('bueno', 'Bueno'), ('muy_bueno', 'Muy Bueno'), ('excelente', 'Excelente')], max_length=30, null=True)),
-                ('informe_junta', models.FileField(blank=True, null=True, upload_to='evaluaciones/informes/')),
-                ('observaciones', models.TextField(blank=True)),
-                ('carrera_academica', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='evaluaciones', to='carrera_academica.carreraacademica')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("numero_evaluacion", models.PositiveIntegerField()),
+                ("fecha_iniciada", models.DateField()),
+                ("fecha_evaluacion", models.DateField(blank=True, null=True)),
+                (
+                    "anios_evaluados",
+                    models.JSONField(
+                        help_text="Lista de años evaluados, ej: [2022, 2023]"
+                    ),
+                ),
+                (
+                    "estado",
+                    models.CharField(
+                        choices=[
+                            ("pendiente", "Pendiente"),
+                            ("en_proceso", "En Proceso"),
+                            ("completada", "Completada"),
+                        ],
+                        default="pendiente",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "calificacion",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("insuficiente", "Insuficiente"),
+                            ("suficiente", "Suficiente"),
+                            ("bueno", "Bueno"),
+                            ("muy_bueno", "Muy Bueno"),
+                            ("excelente", "Excelente"),
+                        ],
+                        max_length=30,
+                        null=True,
+                    ),
+                ),
+                (
+                    "informe_junta",
+                    models.FileField(
+                        blank=True, null=True, upload_to="evaluaciones/informes/"
+                    ),
+                ),
+                ("observaciones", models.TextField(blank=True)),
+                (
+                    "carrera_academica",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="evaluaciones",
+                        to="carrera_academica.carreraacademica",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Evaluación',
-                'verbose_name_plural': 'Evaluaciones',
-                'ordering': ['carrera_academica', 'numero_evaluacion'],
-                'unique_together': {('carrera_academica', 'numero_evaluacion')},
+                "verbose_name": "Evaluación",
+                "verbose_name_plural": "Evaluaciones",
+                "ordering": ["carrera_academica", "numero_evaluacion"],
+                "unique_together": {("carrera_academica", "numero_evaluacion")},
             },
         ),
         migrations.CreateModel(
-            name='Formulario',
+            name="Formulario",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('tipo', models.CharField(choices=[('F01', 'F01 - Docencia de Grado'), ('F02', 'F02 - Docencia de Posgrado'), ('F03', 'F03 - Dirección de Tesis'), ('F04', 'F04 - Formación de RRHH'), ('F05', 'F05 - Extensión'), ('F06', 'F06 - Publicaciones'), ('F07', 'F07 - Transferencia'), ('F08', 'F08 - Gestión'), ('F09', 'F09 - Cursos y Congresos'), ('F10', 'F10 - Distinciones'), ('F11', 'F11 - Actividades Profesionales'), ('F12', 'F12 - Proyectos de Investigación'), ('F13', 'F13 - Desarrollo e Innovación'), ('CV', 'Curriculum Vitae'), ('ENC', 'Encuesta Estudiantil')], max_length=10)),
-                ('anio_actividad', models.PositiveIntegerField(blank=True, help_text='Año de la actividad (para formularios anuales)', null=True)),
-                ('archivo', models.FileField(upload_to='formularios_ca/%Y/')),
-                ('fecha_entrega', models.DateField(auto_now_add=True)),
-                ('observaciones', models.TextField(blank=True)),
-                ('validado', models.BooleanField(default=False)),
-                ('carrera_academica', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='carrera_academica.carreraacademica')),
-                ('evaluacion', models.ForeignKey(blank=True, help_text='Evaluación a la que pertenece (si aplica)', null=True, on_delete=django.db.models.deletion.CASCADE, to='carrera_academica.evaluacion')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "tipo",
+                    models.CharField(
+                        choices=[
+                            ("F01", "F01 - Docencia de Grado"),
+                            ("F02", "F02 - Docencia de Posgrado"),
+                            ("F03", "F03 - Dirección de Tesis"),
+                            ("F04", "F04 - Formación de RRHH"),
+                            ("F05", "F05 - Extensión"),
+                            ("F06", "F06 - Publicaciones"),
+                            ("F07", "F07 - Transferencia"),
+                            ("F08", "F08 - Gestión"),
+                            ("F09", "F09 - Cursos y Congresos"),
+                            ("F10", "F10 - Distinciones"),
+                            ("F11", "F11 - Actividades Profesionales"),
+                            ("F12", "F12 - Proyectos de Investigación"),
+                            ("F13", "F13 - Desarrollo e Innovación"),
+                            ("CV", "Curriculum Vitae"),
+                            ("ENC", "Encuesta Estudiantil"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "anio_actividad",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        help_text="Año de la actividad (para formularios anuales)",
+                        null=True,
+                    ),
+                ),
+                ("archivo", models.FileField(upload_to="formularios_ca/%Y/")),
+                ("fecha_entrega", models.DateField(auto_now_add=True)),
+                ("observaciones", models.TextField(blank=True)),
+                ("validado", models.BooleanField(default=False)),
+                (
+                    "carrera_academica",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="carrera_academica.carreraacademica",
+                    ),
+                ),
+                (
+                    "evaluacion",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="Evaluación a la que pertenece (si aplica)",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="carrera_academica.evaluacion",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Formulario',
-                'verbose_name_plural': 'Formularios',
-                'ordering': ['-fecha_entrega'],
+                "verbose_name": "Formulario",
+                "verbose_name_plural": "Formularios",
+                "ordering": ["-fecha_entrega"],
             },
         ),
         migrations.CreateModel(
-            name='JuntaEvaluadora',
+            name="JuntaEvaluadora",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('titular_externo1', models.CharField(max_length=255)),
-                ('institucion_externo1', models.CharField(blank=True, max_length=255)),
-                ('titular_externo2', models.CharField(max_length=255)),
-                ('institucion_externo2', models.CharField(blank=True, max_length=255)),
-                ('suplente_externo', models.CharField(blank=True, max_length=255)),
-                ('institucion_suplente_externo', models.CharField(blank=True, max_length=255)),
-                ('veedor_alumno', models.CharField(blank=True, max_length=255)),
-                ('veedor_graduado', models.CharField(blank=True, max_length=255)),
-                ('fecha_conformacion', models.DateField()),
-                ('carrera_academica', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='junta', to='carrera_academica.carreraacademica')),
-                ('suplente_frlp', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='suplente_frlp', to='planta_docente.docente')),
-                ('titular_frlp', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='titular_frlp', to='planta_docente.docente')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("titular_externo1", models.CharField(max_length=255)),
+                ("institucion_externo1", models.CharField(blank=True, max_length=255)),
+                ("titular_externo2", models.CharField(max_length=255)),
+                ("institucion_externo2", models.CharField(blank=True, max_length=255)),
+                ("suplente_externo", models.CharField(blank=True, max_length=255)),
+                (
+                    "institucion_suplente_externo",
+                    models.CharField(blank=True, max_length=255),
+                ),
+                ("veedor_alumno", models.CharField(blank=True, max_length=255)),
+                ("veedor_graduado", models.CharField(blank=True, max_length=255)),
+                ("fecha_conformacion", models.DateField()),
+                (
+                    "carrera_academica",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="junta",
+                        to="carrera_academica.carreraacademica",
+                    ),
+                ),
+                (
+                    "suplente_frlp",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="suplente_frlp",
+                        to="planta_docente.docente",
+                    ),
+                ),
+                (
+                    "titular_frlp",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="titular_frlp",
+                        to="planta_docente.docente",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Junta Evaluadora',
-                'verbose_name_plural': 'Juntas Evaluadoras',
+                "verbose_name": "Junta Evaluadora",
+                "verbose_name_plural": "Juntas Evaluadoras",
             },
         ),
     ]
