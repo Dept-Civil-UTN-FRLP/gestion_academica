@@ -75,7 +75,7 @@ class CarreraAcademicaDetailView(LoginRequiredMixin, DetailView):
             '-fecha_entrega')[:10]
         try:
             context['junta'] = self.object.junta
-        except:
+        except self.object.junta.DoesNotExist:
             context['junta'] = None
         return context
 
