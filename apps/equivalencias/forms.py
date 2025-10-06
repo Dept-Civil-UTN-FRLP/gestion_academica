@@ -1,5 +1,10 @@
 from django import forms
-from .models import Estudiante, SolicitudEquivalencia, DetalleSolicitud, DocumentoAdjunto
+from .models import (
+    Estudiante,
+    SolicitudEquivalencia,
+    DetalleSolicitud,
+    DocumentoAdjunto,
+)
 
 
 class EstudianteForm(forms.ModelForm):
@@ -7,14 +12,19 @@ class EstudianteForm(forms.ModelForm):
 
     class Meta:
         model = Estudiante
-        fields = ['nombre_completo', 'dni_pasaporte',
-                  'email_estudiante', 'telefono', 'carrera']
+        fields = [
+            "nombre_completo",
+            "dni_pasaporte",
+            "email_estudiante",
+            "telefono",
+            "carrera",
+        ]
         widgets = {
-            'nombre_completo': forms.TextInput(attrs={'class': 'form-control'}),
-            'dni_pasaporte': forms.TextInput(attrs={'class': 'form-control'}),
-            'email_estudiante': forms.EmailInput(attrs={'class': 'form-control'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-            'carrera': forms.Select(attrs={'class': 'form-select'}),
+            "nombre_completo": forms.TextInput(attrs={"class": "form-control"}),
+            "dni_pasaporte": forms.TextInput(attrs={"class": "form-control"}),
+            "email_estudiante": forms.EmailInput(attrs={"class": "form-control"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control"}),
+            "carrera": forms.Select(attrs={"class": "form-select"}),
         }
 
 
@@ -23,10 +33,10 @@ class SolicitudEquivalenciaForm(forms.ModelForm):
 
     class Meta:
         model = SolicitudEquivalencia
-        fields = ['estudiante', 'observaciones']
+        fields = ["estudiante", "observaciones"]
         widgets = {
-            'estudiante': forms.Select(attrs={'class': 'form-select'}),
-            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            "estudiante": forms.Select(attrs={"class": "form-select"}),
+            "observaciones": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
         }
 
 
@@ -35,13 +45,19 @@ class DetalleSolicitudForm(forms.ModelForm):
 
     class Meta:
         model = DetalleSolicitud
-        fields = ['asignatura', 'estado_asignatura',
-                  'detalle_pc', 'observaciones_docente']
+        fields = [
+            "asignatura",
+            "estado_asignatura",
+            "detalle_pc",
+            "observaciones_docente",
+        ]
         widgets = {
-            'asignatura': forms.Select(attrs={'class': 'form-select'}),
-            'estado_asignatura': forms.Select(attrs={'class': 'form-select'}),
-            'detalle_pc': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'observaciones_docente': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            "asignatura": forms.Select(attrs={"class": "form-select"}),
+            "estado_asignatura": forms.Select(attrs={"class": "form-select"}),
+            "detalle_pc": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+            "observaciones_docente": forms.Textarea(
+                attrs={"class": "form-control", "rows": 2}
+            ),
         }
 
 
@@ -50,9 +66,9 @@ class DocumentoAdjuntoForm(forms.ModelForm):
 
     class Meta:
         model = DocumentoAdjunto
-        fields = ['archivo', 'nombre_archivo', 'descripcion']
+        fields = ["archivo", "nombre_archivo", "descripcion"]
         widgets = {
-            'archivo': forms.FileInput(attrs={'class': 'form-control'}),
-            'nombre_archivo': forms.TextInput(attrs={'class': 'form-control'}),
-            'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
+            "archivo": forms.FileInput(attrs={"class": "form-control"}),
+            "nombre_archivo": forms.TextInput(attrs={"class": "form-control"}),
+            "descripcion": forms.TextInput(attrs={"class": "form-control"}),
         }

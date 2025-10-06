@@ -4,16 +4,13 @@ from django.db import models
 
 class UserProfile(models.Model):
     """Perfil de usuario vinculado a departamentos"""
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name='profile')
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     departamentos = models.ManyToManyField(
-        'core.Departamento',
-        related_name='usuarios',
-        blank=True
+        "core.Departamento", related_name="usuarios", blank=True
     )
     es_superadmin = models.BooleanField(
-        default=False,
-        help_text="Acceso a todos los departamentos"
+        default=False, help_text="Acceso a todos los departamentos"
     )
     telefono = models.CharField(max_length=20, blank=True)
 

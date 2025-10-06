@@ -8,23 +8,27 @@ class DepartamentoAccessMixin(LoginRequiredMixin):
     """
     Mixin para verificar acceso por departamento
     """
-    departamento_field = 'departamento'  # Campo del modelo que tiene el departamento
+
+    departamento_field = "departamento"  # Campo del modelo que tiene el departamento
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
 
         # Superadmin tiene acceso a todo
-        if hasattr(request.user, 'profile') and request.user.profile.es_superadmin:
+        if hasattr(request.user, "profile") and request.user.profile.es_superadmin:
             return super().dispatch(request, *args, **kwargs)
 
         # Verificar acceso al departamento
-        obj = self.get_object() if hasattr(self, 'get_object') else None
+        obj = self.get_object() if hasattr(self, "get_object") else None
         if obj:
             departamento = getattr(obj, self.departamento_field, None)
-            if departamento and not request.user.profile.tiene_acceso_departamento(departamento):
+            if departamento and not request.user.profile.tiene_acceso_departamento(
+                departamento
+            ):
                 messages.error(
-                    request, 'No tienes permiso para acceder a este departamento.')
+                    request, "No tienes permiso para acceder a este departamento."
+                )
                 raise PermissionDenied
 
         return super().dispatch(request, *args, **kwargs)
@@ -37,12 +41,13 @@ class SuperadminRequiredMixin(UserPassesTestMixin):
 
     def test_func(self):
         return (
-            self.request.user.is_authenticated and
-            hasattr(self.request.user, 'profile') and
-            self.request.user.profile.es_superadmin
+            self.request.user.is_authenticated
+            and hasattr(self.request.user, "profile")
+            and self.request.user.profile.es_superadmin
         )
 
     def handle_no_permission(self):
         messages.error(
-            self.request, 'Solo los superadministradores pueden acceder a esta sección.')
-        return redirect('home')
+            self.request, "Solo los superadministradores pueden acceder a esta sección."
+        )
+        return redirect("home")

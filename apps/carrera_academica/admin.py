@@ -10,30 +10,43 @@ class JuntaEvaluadoraInline(admin.StackedInline):
 class EvaluacionInline(admin.TabularInline):
     model = Evaluacion
     extra = 0
-    readonly_fields = ['fecha_iniciada']
+    readonly_fields = ["fecha_iniciada"]
 
 
 @admin.register(CarreraAcademica)
 class CarreraAcademicaAdmin(admin.ModelAdmin):
-    list_display = ['numero_expediente', 'docente', 'estado',
-                    'fecha_vencimiento_actual', 'dias_hasta_vencimiento']
-    list_filter = ['estado', 'fecha_inicio']
-    search_fields = ['numero_expediente',
-                     'cargo__docente__apellido', 'cargo__docente__nombre']
+    list_display = [
+        "numero_expediente",
+        "docente",
+        "estado",
+        "fecha_vencimiento_actual",
+        "dias_hasta_vencimiento",
+    ]
+    list_filter = ["estado", "fecha_inicio"]
+    search_fields = [
+        "numero_expediente",
+        "cargo__docente__apellido",
+        "cargo__docente__nombre",
+    ]
     inlines = [JuntaEvaluadoraInline, EvaluacionInline]
-    readonly_fields = ['anios_activa', 'dias_hasta_vencimiento']
+    readonly_fields = ["anios_activa", "dias_hasta_vencimiento"]
 
 
 class FormularioInline(admin.TabularInline):
     model = Formulario
     extra = 0
-    readonly_fields = ['fecha_entrega']
+    readonly_fields = ["fecha_entrega"]
 
 
 @admin.register(Evaluacion)
 class EvaluacionAdmin(admin.ModelAdmin):
-    list_display = ['carrera_academica', 'numero_evaluacion',
-                    'estado', 'calificacion', 'fecha_evaluacion']
-    list_filter = ['estado', 'calificacion']
-    search_fields = ['carrera_academica__numero_expediente']
+    list_display = [
+        "carrera_academica",
+        "numero_evaluacion",
+        "estado",
+        "calificacion",
+        "fecha_evaluacion",
+    ]
+    list_filter = ["estado", "calificacion"]
+    search_fields = ["carrera_academica__numero_expediente"]
     inlines = [FormularioInline]
