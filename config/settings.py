@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from django.contrib.messages import constants as messages
 import os
+import sys
 from pathlib import Path
 from decouple import config, Csv
 
@@ -87,17 +88,25 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": config("DB_ENGINE", default="django.db.backends.postgresql"),
-        "NAME": config("DB_NAME", default="gestion_academica"),
-        "USER": config("DB_USER", default="postgres"),
-        "PASSWORD": config("DB_PASSWORD", default="your_password"),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", default="5432"),
-        "OPTIONS": {"options": "-c client_encoding=UTF8"},
+if 'test' in os.sys.argv:
+    DATABASES = {
+        "default": {
+            "ENGINE": config("DB_ENGINE", default="django.db.backends.sqlite3"),
+            "NAME": config("DB_NAME", default=":memory:"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": config("DB_ENGINE", default="django.db.backends.postgresql"),
+            "NAME": config("DB_NAME", default="gestion_academica"),
+            "USER": config("DB_USER", default="postgres"),
+            "PASSWORD": config("DB_PASSWORD", default="your_password"),
+            "HOST": config("DB_HOST", default="localhost"),
+            "PORT": config("DB_PORT", default="5432"),
+            "OPTIONS": {"options": "-c client_encoding=UTF8"},
+        }
+    }
 
 
 # Password validation
