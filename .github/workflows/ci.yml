@@ -46,6 +46,9 @@ jobs:
       - name: Formateo con Black
         run: black --check .
 
+      - name: Crear directorio de logs
+        run: mkdir -p logs
+
        # 6. Ejecuta las pruebas automatizadas de Django
       - name: Ejecutar Pruebas
         # Aquí inyectamos las variables de entorno para el CI
