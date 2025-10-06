@@ -37,8 +37,9 @@ def days_until(value):
     if not value:
         return None
     try:
-        today = timezone.now().date() if timezone.is_aware(
-            timezone.now()) else date.today()
+        today = (
+            timezone.now().date() if timezone.is_aware(timezone.now()) else date.today()
+        )
         return (value - today).days if isinstance(value, date) else None
     except (ValueError, TypeError):
         return None
@@ -50,11 +51,13 @@ def days_since(value):
     if not value:
         return None
     try:
-        today = timezone.now().date() if timezone.is_aware(
-            timezone.now()) else date.today()
+        today = (
+            timezone.now().date() if timezone.is_aware(timezone.now()) else date.today()
+        )
         return (today - value).days if isinstance(value, date) else None
     except (ValueError, TypeError):
         return None
+
 
 # =========================
 # FILTROS NUMÉRICOS / TEXTO
@@ -65,7 +68,7 @@ def days_since(value):
 def percentage(value, total):
     """Calcula el porcentaje"""
     try:
-        return round((float(value)/float(total))*100, 2) if float(total) != 0 else 0
+        return round((float(value) / float(total)) * 100, 2) if float(total) != 0 else 0
     except (ValueError, TypeError, ZeroDivisionError):
         return 0
 
@@ -74,10 +77,10 @@ def percentage(value, total):
 def truncate_chars(value, length):
     """Trunca un string a cierta longitud"""
     if not value:
-        return ''
+        return ""
     try:
         length = int(length)
-        return value[:length] + '...' if len(value) > length else value
+        return value[:length] + "..." if len(value) > length else value
     except (ValueError, TypeError):
         return value
 
@@ -95,9 +98,10 @@ def multiply(value, arg):
 def divide(value, arg):
     """Divide dos valores"""
     try:
-        return float(value)/float(arg) if float(arg) != 0 else 0
+        return float(value) / float(arg) if float(arg) != 0 else 0
     except (ValueError, TypeError, ZeroDivisionError):
         return 0
+
 
 # =========================
 # FILTROS DE FORMATO
@@ -108,7 +112,7 @@ def divide(value, arg):
 def format_dni(value):
     """Formatea un DNI con puntos"""
     if not value:
-        return ''
+        return ""
     try:
         s = str(value)
         parts = []
@@ -117,7 +121,7 @@ def format_dni(value):
             s = s[:-3]
         if s:
             parts.insert(0, s)
-        return '.'.join(parts)
+        return ".".join(parts)
     except (ValueError, TypeError):
         return value
 
@@ -126,9 +130,9 @@ def format_dni(value):
 def format_phone(value):
     """Formatea un teléfono"""
     if not value:
-        return ''
+        return ""
     try:
-        s = str(value).replace(' ', '').replace('-', '')
+        s = str(value).replace(" ", "").replace("-", "")
         return f"({s[:3]}) {s[3:6]}-{s[6:]}" if len(s) == 10 else value
     except (ValueError, TypeError):
         return value
@@ -144,22 +148,35 @@ def get_item(dictionary, key):
 def badge_color(estado):
     """Clase CSS para badges según estado"""
     colors = {
-        'activo': 'success', 'inactivo': 'secondary', 'pendiente': 'warning',
-        'aprobado': 'success', 'rechazado': 'danger', 'en_proceso': 'info',
-        'completado': 'success', 'cancelado': 'danger', 'licencia': 'warning', 'baja': 'danger'
+        "activo": "success",
+        "inactivo": "secondary",
+        "pendiente": "warning",
+        "aprobado": "success",
+        "rechazado": "danger",
+        "en_proceso": "info",
+        "completado": "success",
+        "cancelado": "danger",
+        "licencia": "warning",
+        "baja": "danger",
     }
-    return colors.get(estado.lower() if estado else '', 'secondary')
+    return colors.get(estado.lower() if estado else "", "secondary")
 
 
 @register.filter
 def status_icon(estado):
     """Icono Bootstrap según estado"""
     icons = {
-        'activo': 'check-circle-fill', 'inactivo': 'x-circle', 'pendiente': 'clock',
-        'aprobado': 'check-circle-fill', 'rechazado': 'x-circle-fill', 'en_proceso': 'hourglass-split',
-        'completado': 'check-all', 'cancelado': 'x-circle'
+        "activo": "check-circle-fill",
+        "inactivo": "x-circle",
+        "pendiente": "clock",
+        "aprobado": "check-circle-fill",
+        "rechazado": "x-circle-fill",
+        "en_proceso": "hourglass-split",
+        "completado": "check-all",
+        "cancelado": "x-circle",
     }
-    return icons.get(estado.lower() if estado else '', 'circle')
+    return icons.get(estado.lower() if estado else "", "circle")
+
 
 # =========================
 # SIMPLE TAGS
@@ -191,24 +208,24 @@ def url_replace(request, field, value):
     d[field] = value
     return d.urlencode()
 
+
 # =========================
 # INCLUSION TAGS
 # =========================
 
 
-@register.inclusion_tag('components/pagination.html', takes_context=True)
+@register.inclusion_tag("components/pagination.html", takes_context=True)
 def pagination(context, page_obj, adjacent_pages=2):
     """Genera paginación completa"""
     start_page = max(page_obj.number - adjacent_pages, 1)
-    end_page = min(page_obj.number + adjacent_pages,
-                   page_obj.paginator.num_pages)
+    end_page = min(page_obj.number + adjacent_pages, page_obj.paginator.num_pages)
     page_numbers = range(start_page, end_page + 1)
     return {
-        'page_obj': page_obj,
-        'page_numbers': page_numbers,
-        'show_first': start_page > 1,
-        'show_last': end_page < page_obj.paginator.num_pages,
-        'request': context.get('request'),
+        "page_obj": page_obj,
+        "page_numbers": page_numbers,
+        "show_first": start_page > 1,
+        "show_last": end_page < page_obj.paginator.num_pages,
+        "request": context.get("request"),
     }
 
 
@@ -235,7 +252,7 @@ def count_where(queryset, condition):
     También puedes usar operadores lógicos simples como suma: 'campo1=valor1+campo2=valor2'
     """
     try:
-        conditions = [c.split('=') for c in condition.split(',')]
+        conditions = [c.split("=") for c in condition.split(",")]
         count = 0
         for obj in queryset:
             match = True
