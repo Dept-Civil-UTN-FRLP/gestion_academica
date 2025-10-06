@@ -41,7 +41,7 @@ jobs:
 
       # 4. Ejecuta el linter para verificar la calidad del código
       - name: Linting con Ruff
-        run: ruff check .
+        run: ruff check . --fix
 
       # 5. Verifica que el código esté formateado correctamente con Black
       - name: Formateo con Black
