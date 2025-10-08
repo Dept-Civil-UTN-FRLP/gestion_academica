@@ -88,22 +88,22 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if "test" in sys.argv:
+if config("DB_NAME") == ":memory:" or config("DB_ENGINE") == "django.db.backends.sqlite3":
     DATABASES = {
         "default": {
-            "ENGINE": config("DB_ENGINE", default="django.db.backends.sqlite3"),
-            "NAME": config("DB_NAME", default=":memory:"),
+            "ENGINE": config("DB_ENGINE"),
+            "NAME": config("DB_NAME"),
         }
     }
 else:
     DATABASES = {
         "default": {
-            "ENGINE": config("DB_ENGINE", default="django.db.backends.postgresql"),
-            "NAME": config("DB_NAME", default="gestion_academica"),
-            "USER": config("DB_USER", default="postgres"),
-            "PASSWORD": config("DB_PASSWORD", default="your_password"),
-            "HOST": config("DB_HOST", default="localhost"),
-            "PORT": config("DB_PORT", default="5432"),
+            "ENGINE": config("DB_ENGINE"),
+            "NAME": config("DB_NAME"),
+            "USER": config("DB_USER"),
+            "PASSWORD": config("DB_PASSWORD"),
+            "HOST": config("DB_HOST"),
+            "PORT": config("DB_PORT"),
             "OPTIONS": {"options": "-c client_encoding=UTF8"},
         }
     }
