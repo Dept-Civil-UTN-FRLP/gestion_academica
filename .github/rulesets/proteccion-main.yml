@@ -1,0 +1,40 @@
+name: "Protección rama main"
+target: branch
+enforcement: active
+
+conditions:
+  ref_name:
+    include:
+      - main
+
+rules:
+  # 🚫 No permitir borrar ni forzar push
+  - type: deletion
+    parameters:
+      block: true
+
+  - type: force_push
+    parameters:
+      block: true
+
+  # ✅ Exigir que los workflows de CI pasen antes de mergear
+  - type: required_status_checks
+    parameters:
+      strict: true
+      required_checks:
+        - "CI de Django"  # nombre del workflow en .github/workflows/ci.yml
+
+  # ✅ Requerir que todo cambio pase por un Pull Request
+  - type: pull_request
+    parameters:
+      require_code_owner_review: false
+      required_approving_review_count: 1
+      dismiss_stale_reviews_on_push: true
+      block_force_merge: true
+
+  # 🚦 Requerir historial lineal (sin merges de tipo “merge commit”)
+  - type: commit_message_pattern
+    parameters:
+      allow_merge_commits: false
+      allow_rebase_merges: true
+      allow_squash_merges: true
