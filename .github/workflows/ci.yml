@@ -49,16 +49,16 @@ jobs:
       - name: Crear directorio de logs
         run: mkdir -p logs
 
-       # 6. Ejecuta las pruebas automatizadas de Django
+       # 6. Ejecutar test con pytest
       - name: Ejecutar Pruebas
         # Aquí inyectamos las variables de entorno para el CI
         env:
           ALLOWED_HOSTS: 'localhost,127.0.0.1'
-          # Usa el secreto que creaste en GitHub
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           DEBUG: 'True'
-          # Sobrescribe la configuración de la DB para usar SQLite en memoria
           DB_ENGINE: 'django.db.backends.sqlite3'
           DB_NAME: ':memory:'
-        
-        run: python manage.py test
+          DJANGO_SETTINGS_MODULE: 'config.settings'
+
+        run: |
+            pytest -v --cov=apps/usuarios --cov-report=term-missing
