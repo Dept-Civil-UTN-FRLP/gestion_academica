@@ -1,6 +1,6 @@
 # Herramientas de desarrollo
 black==25.9.0
-ruff==0.13.3
+ruff==0.14.0
 pytest==8.4.2
 pytest-django==4.11.1
 pytest-cov==7.0.0
